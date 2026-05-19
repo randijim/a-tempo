@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0a0f">
+<title>A Tiempo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #13131a;
+  --surface2: #1c1c28;
+  --border: rgba(255,255,255,0.06);
+  --text: #f0f0f5;
+  --text-muted: #5a5a72;
+  --text-dim: #3a3a52;
+  --red: #e74c3c;
+  --red-dark: #c0392b;
+  --red-glow: rgba(231,76,60,0.3);
+  --green: #27ae60;
+  --green-light: #2ecc71;
+  --green-glow: rgba(46,204,113,0.3);
+  --yellow: #f39c12;
+  --yellow-glow: rgba(243,156,18,0.3);
+  --blue-rest: #2c3e50;
+  --accent: #e74c3c;
+  --radius: 20px;
+  --radius-sm: 12px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  overflow: hidden;
+  touch-action: manipulation;
+}
+
+/* ── SCREENS ────────────────────────────────────────────────────── */
+.screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+.screen.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ── SPLASH ─────────────────────────────────────────────────────── */
+#splash {
+  background: var(--bg);
+  gap: 16px;
+}
+.splash-logo {
+  font-size: 56px;
+  font-weight: 900;
+  letter-spacing: -3px;
+  color: var(--text);
+  animation: fadeUp 0.8s ease forwards;
+}
+.splash-logo span { color: var(--accent); }
+.splash-slogan {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  animation: fadeUp 0.8s ease 0.2s both;
+  text-align: center;
+  max-width: 260px;
+}
+.splash-bar {
+  width: 48px;
+  height: 3px;
+  background: var(--accent);
+  border-radius: 2px;
+  margin-top: 8px;
+  animation: fadeUp 0.8s ease 0.4s both, grow 1.4s ease 0.6s both;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes grow {
+  from { width: 0; } to { width: 120px; }
+}
+
+/* ── ONBOARDING ─────────────────────────────────────────────────── */
+#onboarding {
+  justify-content: flex-start;
+  padding: 60px 24px 40px;
+  gap: 0;
+}
+.ob-title {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin-bottom: 6px;
+  align-self: flex-start;
+}
+.ob-subtitle {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 32px;
+  align-self: flex-start;
+}
+.ob-section {
+  width: 100%;
+  margin-bottom: 24px;
+}
+.ob-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+.ob-input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  font-size: 15px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.ob-input:focus { border-color: var(--accent); }
+.ob-input option { background: var(--surface); }
+.gender-row {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+.gender-btn {
+  flex: 1;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  font-size: 15px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.gender-btn .icon { font-size: 24px; }
+.gender-btn.selected {
+  border-color: var(--accent);
+  color: var(--text);
+  background: rgba(231,76,60,0.08);
+}
+.ob-row { display: flex; gap: 12px; }
+.ob-row .ob-section { flex: 1; margin-bottom: 0; }
+.ob-btn {
+  width: 100%;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 18px;
+  font-size: 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.ob-btn:active { transform: scale(0.98); }
+.ob-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── HOME ───────────────────────────────────────────────────────── */
+#home {
+  background: var(--bg);
+  padding: 0 24px;
+  gap: 0;
+  justify-content: center;
+}
+.home-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 56px 24px 20px;
+}
+.home-logo {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -1px;
+}
+.home-logo span { color: var(--accent); }
+.gear-btn {
+  width: 40px;
+  height: 40px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  transition: background 0.2s;
+}
+.gear-btn:active { background: var(--surface2); }
+.home-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+.home-greeting {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  text-align: center;
+}
+.home-last {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  padding: 8px 16px;
+}
+.start-btn {
+  width: 100%;
+  max-width: 320px;
+  background: var(--accent);
+  border: none;
+  border-radius: 18px;
+  padding: 22px;
+  font-size: 20px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 800;
+  color: #fff;
+  cursor: pointer;
+  letter-spacing: -0.5px;
+  margin-top: 16px;
+  box-shadow: 0 8px 32px var(--red-glow);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.start-btn:active {
+  transform: scale(0.97);
+  box-shadow: 0 4px 16px var(--red-glow);
+}
+
+/* ── PRE-SESIÓN ─────────────────────────────────────────────────── */
+#presession {
+  justify-content: flex-start;
+  padding: 56px 20px 40px;
+  gap: 0;
+}
+.ps-back {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  padding: 4px 0;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ps-title {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin-bottom: 4px;
+  align-self: flex-start;
+}
+.ps-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 28px;
+  align-self: flex-start;
+}
+.ps-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  align-self: flex-start;
+}
+.zones-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 28px;
+}
+.zone-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.zone-card.selected {
+  border-color: var(--accent);
+  background: rgba(231,76,60,0.08);
+}
+.zone-icon { font-size: 28px; }
+.zone-name { font-size: 14px; font-weight: 700; }
+.zone-desc { font-size: 11px; color: var(--text-muted); }
+.qty-row {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 32px;
+}
+.qty-btn {
+  flex: 1;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 8px;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: 'DM Mono', monospace;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.qty-btn.selected {
+  border-color: var(--accent);
+  color: var(--text);
+  background: rgba(231,76,60,0.08);
+}
+.ps-start {
+  width: 100%;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 18px;
+  font-size: 17px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 800;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 6px 24px var(--red-glow);
+  transition: transform 0.15s;
+}
+.ps-start:active { transform: scale(0.98); }
+
+/* ── SESIÓN ACTIVA ──────────────────────────────────────────────── */
+#session {
+  padding: 0;
+  justify-content: flex-start;
+  background: var(--bg);
+  transition: background 0.5s ease;
+}
+#session.phase-work   { background: #071a0e; }
+#session.phase-rest   { background: #1a0707; }
+#session.phase-yellow { background: #1a1007; }
+#session.phase-pause  { background: #070a1a; }
+
+.session-top {
+  width: 100%;
+  padding: 52px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.session-phase-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  transition: color 0.5s;
+}
+.session-exercise {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  text-align: center;
+  transition: color 0.3s;
+}
+.session-muscles {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* CONTADOR CIRCULAR */
+.timer-wrap {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0;
+  position: relative;
+}
+.timer-svg {
+  width: 220px;
+  height: 220px;
+  transform: rotate(-90deg);
+}
+.timer-track { fill: none; stroke: var(--surface2); stroke-width: 8; }
+.timer-progress {
+  fill: none;
+  stroke: var(--green-light);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 628;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1s linear, stroke 0.5s ease;
+}
+.timer-center {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+.timer-number {
+  font-size: 64px;
+  font-weight: 900;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: -4px;
+  line-height: 1;
+  transition: color 0.5s;
+  color: var(--green-light);
+}
+.timer-unit {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* GIF DEL EJERCICIO */
+.exercise-gif-wrap {
+  width: calc(100% - 32px);
+  max-height: 140px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  margin: 0 16px;
+  display: none;
+  position: relative;
+}
+.exercise-gif-wrap.visible { display: block; }
+.exercise-gif-wrap img {
+  width: 100%;
+  height: 140px;
+  object-fit: contain;
+  background: #0d0d0d;
+  display: block;
+}
+.gif-badge-session {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(39,174,96,0.9);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+.tips-session {
+  width: calc(100% - 32px);
+  margin: 8px 16px 0;
+  background: rgba(243,156,18,0.05);
+  border-left: 3px solid var(--yellow);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 8px 12px;
+  display: none;
+}
+.tips-session.visible { display: block; }
+.tips-session-title {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--yellow);
+  margin-bottom: 5px;
+}
+.tips-session-item {
+  font-size: 11px;
+  color: #ccc;
+  line-height: 1.5;
+  display: flex;
+  gap: 6px;
+}
+.tips-session-item::before { content: "→"; color: var(--yellow); flex-shrink: 0; }
+
+/* PROGRESO */
+.progress-section {
+  width: calc(100% - 32px);
+  margin: 8px 16px 0;
+}
+.progress-bar-bg {
+  background: var(--surface2);
+  border-radius: 4px;
+  height: 4px;
+}
+.progress-bar-fill {
+  background: var(--accent);
+  height: 4px;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+.progress-text {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 6px;
+  font-family: 'DM Mono', monospace;
+}
+
+/* BOTONES SESIÓN */
+.session-actions {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 16px 36px;
+  display: flex;
+  gap: 10px;
+}
+.btn-pause-session {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-pause-session:active { background: var(--surface2); }
+.btn-skip-session {
+  flex: 1.4;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-skip-session:active { background: var(--surface2); }
+
+/* ── POPUP ──────────────────────────────────────────────────────── */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.popup-overlay.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+.popup-sheet {
+  width: 100%;
+  background: var(--surface);
+  border-radius: 24px 24px 0 0;
+  padding: 24px 20px 48px;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.popup-overlay.visible .popup-sheet {
+  transform: translateY(0);
+}
+.popup-handle {
+  width: 40px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 0 auto 20px;
+}
+.popup-icon { font-size: 36px; text-align: center; margin-bottom: 12px; }
+.popup-title {
+  font-size: 20px;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+.popup-body {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+.popup-science {
+  background: rgba(243,156,18,0.07);
+  border: 1px solid rgba(243,156,18,0.2);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 12px;
+  color: #ccc;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+.popup-science strong { color: var(--yellow); }
+.popup-btn-primary {
+  width: 100%;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  font-size: 15px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: opacity 0.2s;
+}
+.popup-btn-secondary {
+  width: 100%;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  font-size: 15px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+/* ── RESUMEN ─────────────────────────────────────────────────────── */
+#summary {
+  justify-content: flex-start;
+  padding: 60px 20px 40px;
+  gap: 0;
+}
+.summary-header { text-align: center; margin-bottom: 28px; width: 100%; }
+.summary-emoji { font-size: 48px; margin-bottom: 12px; }
+.summary-title {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin-bottom: 4px;
+}
+.summary-sub { font-size: 13px; color: var(--text-muted); }
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+.summary-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.summary-card-icon { font-size: 20px; }
+.summary-card-value {
+  font-size: 32px;
+  font-weight: 900;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: -2px;
+  color: var(--accent);
+}
+.summary-card-label { font-size: 11px; color: var(--text-muted); }
+.summary-actions { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.summary-btn {
+  width: 100%;
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  font-size: 15px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  border: none;
+}
+.summary-btn:active { transform: scale(0.98); }
+.summary-btn.primary { background: var(--accent); color: #fff; }
+.summary-btn.secondary { background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+.summary-btn.ghost { background: none; border: 1px solid var(--border); color: var(--text-muted); }
+
+/* ── CONFIGURACIÓN ──────────────────────────────────────────────── */
+#config {
+  justify-content: flex-start;
+  padding: 56px 20px 40px;
+  gap: 0;
+}
+.config-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+.config-back {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 22px;
+  cursor: pointer;
+  padding: 4px;
+}
+.config-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+.config-section {
+  width: 100%;
+  margin-bottom: 20px;
+}
+.config-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  padding-left: 4px;
+}
+.config-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.config-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.config-row:last-child { border-bottom: none; }
+.config-row-label { font-size: 14px; font-weight: 500; }
+.config-row-value { font-size: 13px; color: var(--text-muted); }
+.toggle {
+  width: 44px;
+  height: 26px;
+  background: var(--surface2);
+  border-radius: 13px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.3s;
+  border: none;
+}
+.toggle.on { background: var(--green); }
+.toggle::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.3s;
+}
+.toggle.on::after { transform: translateX(18px); }
+
+/* ── UTILIDADES ──────────────────────────────────────────────────── */
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- ── SPLASH ───────────────────────────────────────────────────── -->
+<div id="splash" class="screen active">
+  <div class="splash-logo">A<span>.</span>Tiempo</div>
+  <div class="splash-slogan">Entrenás mejor cuando sabés cuándo parar.</div>
+  <div class="splash-bar"></div>
+</div>
+
+<!-- ── ONBOARDING ───────────────────────────────────────────────── -->
+<div id="onboarding" class="screen">
+  <div class="ob-title">Configurá tu perfil</div>
+  <div class="ob-subtitle">Solo una vez. Después, A Tiempo hace el resto.</div>
+
+  <div class="ob-section">
+    <div class="ob-label">Nombre (opcional)</div>
+    <input class="ob-input" type="text" id="ob-name" placeholder="¿Cómo te llamás?" />
+  </div>
+
+  <div class="ob-section">
+    <div class="ob-label">Género</div>
+    <div class="gender-row">
+      <button class="gender-btn" data-gender="hombre" onclick="selectGender('hombre', this)">
+        <span class="icon">♂</span>Hombre
+      </button>
+      <button class="gender-btn" data-gender="mujer" onclick="selectGender('mujer', this)">
+        <span class="icon">♀</span>Mujer
+      </button>
+    </div>
+  </div>
+
+  <div class="ob-row">
+    <div class="ob-section">
+      <div class="ob-label">Altura (cm)</div>
+      <input class="ob-input" type="number" id="ob-altura" placeholder="170" min="130" max="220"/>
+    </div>
+    <div class="ob-section">
+      <div class="ob-label">Edad</div>
+      <input class="ob-input" type="number" id="ob-edad" placeholder="25" min="12" max="99"/>
+    </div>
+  </div>
+
+  <div class="ob-section" style="margin-top:16px;">
+    <div class="ob-label">Nivel de entrenamiento</div>
+    <select class="ob-input" id="ob-nivel">
+      <option value="">Elegí tu nivel</option>
+      <option value="Principiante">Principiante — Sin experiencia previa</option>
+      <option value="Intermedio">Intermedio — 3 a 12 meses</option>
+      <option value="Avanzado">Avanzado — 1 a 3 años</option>
+      <option value="Experto">Experto — Más de 3 años</option>
+      <option value="Recuperacion">Recuperación — Movilidad y descanso activo</option>
+    </select>
+  </div>
+
+  <div class="ob-section">
+    <div class="ob-label">Zona preferida</div>
+    <select class="ob-input" id="ob-zona">
+      <option value="">Elegí tu zona favorita</option>
+      <option value="Tren Superior">💪 Tren Superior</option>
+      <option value="Tren Inferior">🦵 Tren Inferior</option>
+      <option value="Cardio">❤️ Cardio</option>
+      <option value="Recuperacion">🌀 Recuperación</option>
+    </select>
+  </div>
+
+  <button class="ob-btn" id="ob-submit" onclick="completeOnboarding()" disabled>Empezar →</button>
+</div>
+
+<!-- ── HOME ─────────────────────────────────────────────────────── -->
+<div id="home" class="screen">
+  <div class="home-header">
+    <div class="home-logo">A<span>.</span>Tiempo</div>
+    <div class="gear-btn" onclick="showScreen('config')">⚙</div>
+  </div>
+  <div class="home-content">
+    <div class="home-greeting" id="home-greeting">¡Hola!</div>
+    <div class="home-last" id="home-last" style="display:none"></div>
+    <button class="start-btn" onclick="showScreen('presession')">EMPEZAR</button>
+  </div>
+</div>
+
+<!-- ── PRE-SESIÓN ────────────────────────────────────────────────── -->
+<div id="presession" class="screen">
+  <button class="ps-back" onclick="showScreen('home')">← Volver</button>
+  <div class="ps-title">¿Qué entrenamos hoy?</div>
+  <div class="ps-sub">Elegí zona y cantidad de ejercicios.</div>
+
+  <div class="ps-label">Zona de entrenamiento</div>
+  <div class="zones-grid">
+    <div class="zone-card" data-zona="Tren Superior" onclick="selectZone(this)">
+      <div class="zone-icon">💪</div>
+      <div class="zone-name">Tren Superior</div>
+      <div class="zone-desc">Pecho, espalda, brazos</div>
+    </div>
+    <div class="zone-card" data-zona="Tren Inferior" onclick="selectZone(this)">
+      <div class="zone-icon">🦵</div>
+      <div class="zone-name">Tren Inferior</div>
+      <div class="zone-desc">Piernas, glúteos</div>
+    </div>
+    <div class="zone-card" data-zona="Cardio" onclick="selectZone(this)">
+      <div class="zone-icon">❤️</div>
+      <div class="zone-name">Cardio</div>
+      <div class="zone-desc">Resistencia y quema</div>
+    </div>
+    <div class="zone-card" data-zona="Recuperacion" onclick="selectZone(this)">
+      <div class="zone-icon">🌀</div>
+      <div class="zone-name">Recuperación</div>
+      <div class="zone-desc">Movilidad y descanso</div>
+    </div>
+  </div>
+
+  <div class="ps-label">Cantidad de ejercicios</div>
+  <div class="qty-row" id="qty-row">
+    <button class="qty-btn" data-qty="4" onclick="selectQty(this)">4</button>
+    <button class="qty-btn" data-qty="5" onclick="selectQty(this)">5</button>
+    <button class="qty-btn selected" data-qty="6" onclick="selectQty(this)">6</button>
+    <button class="qty-btn" data-qty="7" onclick="selectQty(this)">7</button>
+    <button class="qty-btn" data-qty="8" onclick="selectQty(this)">8</button>
+  </div>
+
+  <button class="ps-start" onclick="startSession()">Arrancar →</button>
+</div>
+
+<!-- ── SESIÓN ACTIVA ─────────────────────────────────────────────── -->
+<div id="session" class="screen">
+  <div class="session-top">
+    <div class="session-phase-label" id="phase-label">CALENTANDO</div>
+    <div class="session-exercise" id="exercise-name">Jumping Jacks</div>
+    <div class="session-muscles" id="exercise-muscles">Cardio · Cuerpo completo</div>
+  </div>
+
+  <div class="timer-wrap">
+    <svg class="timer-svg" viewBox="0 0 220 220">
+      <circle class="timer-track" cx="110" cy="110" r="100"/>
+      <circle class="timer-progress" id="timer-ring" cx="110" cy="110" r="100"/>
+    </svg>
+    <div class="timer-center">
+      <div class="timer-number" id="timer-display">0:40</div>
+      <div class="timer-unit" id="timer-unit">TRABAJANDO</div>
+    </div>
+  </div>
+
+  <div class="exercise-gif-wrap" id="gif-wrap">
+    <img id="exercise-gif" src="" alt="Ejercicio" onerror="this.parentElement.style.display='none'"/>
+    <span class="gif-badge-session">● EN VIVO</span>
+  </div>
+
+  <div class="tips-session" id="tips-wrap">
+    <div class="tips-session-title">⚡ Técnica</div>
+    <div id="tips-content"></div>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+    <div class="progress-text" id="progress-text">Serie 1 de 3 · Ejercicio 1 de 6</div>
+  </div>
+
+  <div class="session-actions">
+    <button class="btn-pause-session" id="pause-btn" onclick="togglePause()">⏸ Pausar</button>
+    <button class="btn-skip-session" onclick="skipPhase()">Saltar →</button>
+  </div>
+</div>
+
+<!-- ── RESUMEN ───────────────────────────────────────────────────── -->
+<div id="summary" class="screen">
+  <div class="summary-header">
+    <div class="summary-emoji">🎉</div>
+    <div class="summary-title">¡Sesión completada!</div>
+    <div class="summary-sub" id="summary-sub">Tren Superior · Principiante</div>
+  </div>
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-card-icon">🔥</div>
+      <div class="summary-card-value" id="sum-cals">0</div>
+      <div class="summary-card-label">kcal estimadas</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-card-icon">⏱</div>
+      <div class="summary-card-value" id="sum-time">0:00</div>
+      <div class="summary-card-label">Tiempo total</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-card-icon">💪</div>
+      <div class="summary-card-value" id="sum-series">0</div>
+      <div class="summary-card-label">Series completadas</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-card-icon">🏋️</div>
+      <div class="summary-card-value" id="sum-exercises">0</div>
+      <div class="summary-card-label">Ejercicios</div>
+    </div>
+  </div>
+  <div class="summary-actions">
+    <button class="summary-btn primary" onclick="shareSession()">Compartir 📤</button>
+    <button class="summary-btn secondary" onclick="showScreen('presession')">Nueva sesión</button>
+    <button class="summary-btn ghost" onclick="showScreen('home')">Volver al inicio</button>
+  </div>
+</div>
+
+<!-- ── CONFIGURACIÓN ─────────────────────────────────────────────── -->
+<div id="config" class="screen">
+  <div class="config-header">
+    <button class="config-back" onclick="showScreen('home')">←</button>
+    <div class="config-title">Configuración</div>
+  </div>
+
+  <div class="config-section">
+    <div class="config-section-title">Mi perfil</div>
+    <div class="config-card">
+      <div class="config-row">
+        <div class="config-row-label">Nombre</div>
+        <div class="config-row-value" id="cfg-name">—</div>
+      </div>
+      <div class="config-row">
+        <div class="config-row-label">Género</div>
+        <div class="config-row-value" id="cfg-gender">—</div>
+      </div>
+      <div class="config-row">
+        <div class="config-row-label">Nivel</div>
+        <div class="config-row-value" id="cfg-nivel">—</div>
+      </div>
+      <div class="config-row">
+        <div class="config-row-label">Zona preferida</div>
+        <div class="config-row-value" id="cfg-zona">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="config-section">
+    <div class="config-section-title">Visual</div>
+    <div class="config-card">
+      <div class="config-row">
+        <div class="config-row-label">Modo Gimnasio</div>
+        <button class="toggle" id="toggle-gym" onclick="toggleGym(this)"></button>
+      </div>
+      <div class="config-row">
+        <div class="config-row-label">Animaciones de ejercicio</div>
+        <button class="toggle on" id="toggle-gifs" onclick="toggleGifs(this)"></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="config-section">
+    <div class="config-section-title">Sesión</div>
+    <div class="config-card">
+      <div class="config-row">
+        <div class="config-row-label">Aviso de transición</div>
+        <div class="config-row-value">10 seg</div>
+      </div>
+      <div class="config-row">
+        <div class="config-row-label">Pop-up al saltar descanso</div>
+        <button class="toggle on" id="toggle-popup" onclick="togglePopup(this)"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── POPUP: SALTAR DESCANSO ────────────────────────────────────── -->
+<div class="popup-overlay" id="skip-popup">
+  <div class="popup-sheet">
+    <div class="popup-handle"></div>
+    <div class="popup-icon">⚠️</div>
+    <div class="popup-title">¿Seguro que querés saltar el descanso?</div>
+    <div class="popup-body">Tu cuerpo necesita este tiempo para recuperarse correctamente.</div>
+    <div class="popup-science">
+      <strong>La ciencia dice:</strong> Saltear el descanso reduce la fuerza disponible en la próxima serie hasta un 30%. Tu rendimiento y tus resultados dependen de este tiempo.
+    </div>
+    <button class="popup-btn-primary" onclick="closeSkipPopup(false)">Espero el descanso ✓</button>
+    <button class="popup-btn-secondary" onclick="closeSkipPopup(true)">Saltar igual</button>
+  </div>
+</div>
+
+<!-- ── POPUP: CANCELAR SESIÓN ────────────────────────────────────── -->
+<div class="popup-overlay" id="cancel-popup">
+  <div class="popup-sheet">
+    <div class="popup-handle"></div>
+    <div class="popup-icon">🚪</div>
+    <div class="popup-title">¿Querés terminar la sesión?</div>
+    <div class="popup-body">El progreso de esta sesión se guardará hasta donde llegaste.</div>
+    <button class="popup-btn-primary" onclick="closeCancelPopup(false)">No, seguir entrenando</button>
+    <button class="popup-btn-secondary" onclick="closeCancelPopup(true)">Sí, terminar</button>
+  </div>
+</div>
+
+<script>
+// ─── DATOS DE EJERCICIOS ──────────────────────────────────────────
+const EXERCISES = {
+  "Tren Superior": {
+    "Principiante": [
+      { name:"Flexiones de rodillas", muscles:"Pecho · Tríceps · Hombros", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/84.gif", tips:["Cuerpo recto de rodillas a cabeza","Bajá hasta que el pecho casi toque el piso","Codos a 45 grados del cuerpo"] },
+      { name:"Remo en banco", muscles:"Dorsal · Romboides · Bíceps", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/90.gif", tips:["Espalda paralela al piso","Tirá con el codo hacia el techo","Apoyá rodilla y mano en el banco"] },
+      { name:"Press de hombro sentado", muscles:"Hombros · Tríceps", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/39.gif", tips:["Espalda apoyada en respaldo","Subí hasta casi estirar los brazos","Bajá lento y controlado"] },
+      { name:"Curl de bíceps", muscles:"Bíceps · Antebrazo", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/11.gif", tips:["Codos pegados al cuerpo","Girá la muñeca al subir","Bajá sin soltar la tensión"] },
+      { name:"Extensión de tríceps", muscles:"Tríceps", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/56.gif", tips:["Codos apuntando al frente","Solo se mueve el antebrazo","Bajá lento para no golpearte"] },
+      { name:"Apertura de pecho en piso", muscles:"Pecho · Hombros", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/29.gif", tips:["Brazos ligeramente doblados","Bajá hasta sentir el pecho estirado","Subí como si abrazaras un árbol"] },
+      { name:"Elevaciones laterales", muscles:"Hombros laterales", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/42.gif", tips:["Codos ligeramente doblados","Subí hasta la altura del hombro","No uses impulso con el cuerpo"] },
+      { name:"Superman", muscles:"Espalda baja · Glúteos", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/174.gif", tips:["Boca abajo en el piso","Levantá brazos y piernas al mismo tiempo","Mantenés 2 segundos arriba"] },
+    ],
+    "Intermedio": [
+      { name:"Flexiones completas", muscles:"Pecho · Tríceps · Hombros", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/84.gif", tips:["Cuerpo recto de pies a cabeza","Pecho toca el piso en cada rep","Codos a 45 grados del tronco"] },
+      { name:"Remo con barra", muscles:"Dorsal · Romboides · Bíceps", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/95.gif", tips:["Espalda recta a 45 grados","Tirá la barra hacia el ombligo","Apretá los omóplatos arriba"] },
+      { name:"Press de banca", muscles:"Pecho · Tríceps · Hombros", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/28.gif", tips:["Pies apoyados en el piso","Bajá hasta que los codos queden a 90°","Subí sin trabar los codos"] },
+      { name:"Press militar", muscles:"Hombros · Tríceps", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/39.gif", tips:["Core apretado todo el movimiento","No arqueés la espalda baja","Subí en línea recta"] },
+      { name:"Curl martillo", muscles:"Bíceps · Braquiorradial", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/14.gif", tips:["Agarre neutro — pulgares arriba","Codos fijos pegados al cuerpo","Subí y bajá lento"] },
+      { name:"Fondos en silla", muscles:"Tríceps · Pecho", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/59.gif", tips:["Manos en el borde de la silla","Codos apuntan hacia atrás","Bajá hasta 90 grados"] },
+    ],
+    "Avanzado": [
+      { name:"Flexiones con palmada", muscles:"Pecho · Tríceps · Potencia", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/86.gif", tips:["Bajá lento","Empujá explosivo para despegar","Palmada rápida y caída suave"] },
+      { name:"Dominadas", muscles:"Dorsal · Bíceps · Core", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/100.gif", tips:["Agarre supino o prono","Subí hasta que el mentón pase la barra","Bajá completamente cada rep"] },
+      { name:"Press de banca con barra", muscles:"Pecho · Tríceps · Hombros", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/27.gif", tips:["Espalda con leve arco natural","Barra baja al pecho bajo","Codos a 75 grados del tronco"] },
+      { name:"Press Arnold", muscles:"Hombros · Tríceps", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/40.gif", tips:["Empezá con palmas hacia vos","Girá al subir hasta palmas al frente","Movimiento fluido sin pausa"] },
+    ],
+    "Experto": [
+      { name:"Dominadas con peso", muscles:"Dorsal · Bíceps · Core", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/100.gif", tips:["Bajá completamente cada rep","Rango completo de movimiento","Controlá el descenso"] },
+      { name:"Press de banca pesado", muscles:"Pecho · Tríceps · Hombros", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/27.gif", tips:["Arco de espalda controlado","Leg drive para estabilidad","Barra baja al pecho bajo siempre"] },
+      { name:"Remo Pendlay", muscles:"Dorsal · Romboides · Bíceps", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/95.gif", tips:["Espalda paralela al piso","Barra parte del piso cada rep","Tirá explosivo hacia el abdomen"] },
+    ],
+    "Recuperacion": [
+      { name:"Rotaciones de hombro", muscles:"Manguito rotador", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/46.gif", tips:["Movimiento lento y controlado","Sin dolor — si duele pará","Rango completo sin forzar"] },
+      { name:"Retracción escapular", muscles:"Romboides · Trapecio", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/174.gif", tips:["Juntá los omóplatos lentamente","Mantenés 3 segundos","Soltá con control"] },
+    ]
+  },
+  "Tren Inferior": {
+    "Principiante": [
+      { name:"Sentadilla", muscles:"Cuádriceps · Glúteos · Core", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/122.gif", tips:["Pies al ancho de hombros","Rodillas siguen la dirección de los pies","Bajá hasta 90 grados o lo que puedas"] },
+      { name:"Estocada alternada", muscles:"Cuádriceps · Glúteos · Isquios", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/111.gif", tips:["Rodilla delantera no pasa la punta del pie","Torso recto durante el movimiento","Empujá con el talón para subir"] },
+      { name:"Puente de glúteos", muscles:"Glúteos · Isquios · Core", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/136.gif", tips:["Pies apoyados planos en el piso","Subí hasta que el cuerpo quede recto","Apretá los glúteos arriba 1 segundo"] },
+      { name:"Elevación de pantorrillas", muscles:"Gemelos · Sóleo", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/145.gif", tips:["Subí hasta la máxima punta de pie","Bajá lento sin tocar el piso","Podés apoyarte en una pared"] },
+      { name:"Sentadilla sumo", muscles:"Glúteos · Aductores · Cuádriceps", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/124.gif", tips:["Pies más abiertos que los hombros","Puntas hacia afuera","Mancuerna colgando al centro"] },
+      { name:"Peso muerto rumano", muscles:"Isquios · Glúteos · Espalda baja", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/130.gif", tips:["Espalda recta todo el movimiento","Mancuernas rozan las piernas al bajar","Sentís estiramiento en los isquios"] },
+    ],
+    "Intermedio": [
+      { name:"Sentadilla con mancuernas", muscles:"Cuádriceps · Glúteos · Core", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/122.gif", tips:["Mancuernas a los costados","Misma técnica que la sentadilla libre","Talones sin despegar del piso"] },
+      { name:"Estocada caminando", muscles:"Cuádriceps · Glúteos · Isquios", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/112.gif", tips:["Pasos largos y controlados","Rodilla trasera casi toca el piso","Torso erguido durante todo el recorrido"] },
+      { name:"Hip thrust", muscles:"Glúteos · Isquios", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/137.gif", tips:["Hombros apoyados en el banco","Apretá glúteos arriba 2 segundos","Bajá sin apoyar completamente"] },
+      { name:"Sentadilla búlgara", muscles:"Cuádriceps · Glúteos", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/113.gif", tips:["Pie trasero elevado en banco","Rodilla delantera no pasa la punta","Bajá lento y controlado"] },
+    ],
+    "Avanzado": [
+      { name:"Sentadilla con barra", muscles:"Cuádriceps · Glúteos · Core", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/120.gif", tips:["Barra sobre los trapecios","Bajá hasta paralelo o más","Rodillas hacia afuera al subir"] },
+      { name:"Peso muerto convencional", muscles:"Isquios · Glúteos · Espalda", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/128.gif", tips:["Espalda recta desde el inicio","Barra pegada al cuerpo todo el tiempo","Caderas y hombros suben a la vez"] },
+      { name:"Hip thrust con barra", muscles:"Glúteos · Isquios", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/137.gif", tips:["Protección en la barra sobre caderas","Apretá glúteos al máximo arriba","Mirá hacia adelante"] },
+    ],
+  },
+  "Cardio": {
+    "Principiante": [
+      { name:"Marcha en el lugar", muscles:"Cardio · Cuerpo completo", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/155.gif", tips:["Rodillas suben a la cadera","Brazos se mueven naturales","Ritmo cómodo y constante"] },
+      { name:"Jumping Jacks", muscles:"Cardio · Hombros · Piernas", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/156.gif", tips:["Aterrizás con rodillas ligeramente dobladas","Brazos suben sobre la cabeza","Ritmo moderado"] },
+      { name:"Step lateral", muscles:"Cardio · Piernas", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/155.gif", tips:["Paso lateral y juntás los pies","Rodillas ligeramente dobladas","Mantenés el ritmo constante"] },
+      { name:"Rodillas al pecho", muscles:"Cardio · Core · Cadera", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/157.gif", tips:["Subí la rodilla a la cadera","Alternás piernas sin apuro","Core apretado durante el movimiento"] },
+      { name:"Boxeo en el aire", muscles:"Cardio · Hombros · Core", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/155.gif", tips:["Guardia básica","Golpes directos al frente","Rodillas levemente dobladas"] },
+      { name:"Sentadilla + salto suave", muscles:"Cardio · Cuádriceps · Glúteos", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/158.gif", tips:["Bajá a sentadilla","Salto suave al subir","Aterrizás con rodillas dobladas"] },
+    ],
+    "Intermedio": [
+      { name:"Skipping", muscles:"Cardio · Core · Cadera", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/157.gif", tips:["Rodillas suben a la cadera","Brazos se mueven con las piernas","Ritmo rápido y constante"] },
+      { name:"Burpee sin salto", muscles:"Cardio · Cuerpo completo", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/160.gif", tips:["Bajá las manos al piso","Saltás los pies atrás a plancha","Volvés y te parás"] },
+      { name:"Montañero", muscles:"Core · Cardio · Hombros", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/161.gif", tips:["Posición de plancha firme","Rodillas vienen al pecho alternadas","Cadera no sube ni baja"] },
+      { name:"Saltos laterales", muscles:"Cardio · Piernas · Equilibrio", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/158.gif", tips:["Salto de lado a lado","Aterrizás con rodillas dobladas","Ritmo constante"] },
+    ],
+    "Avanzado": [
+      { name:"Burpee completo", muscles:"Cardio · Cuerpo completo", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/160.gif", tips:["Plancha completa en el piso","Salto máximo con brazos arriba","Aterrizás suave con rodillas dobladas"] },
+      { name:"Box Jump", muscles:"Cardio · Cuádriceps · Glúteos", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/158.gif", tips:["Posición atlética antes de saltar","Caés con las dos rodillas dobladas","Bajás caminando — no saltás abajo"] },
+      { name:"Montañero rápido", muscles:"Core · Cardio · Hombros", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/161.gif", tips:["Velocidad máxima manteniendo forma","Cadera baja y estable","Core apretado todo el tiempo"] },
+    ],
+  },
+  "Recuperacion": {
+    "Todos los niveles": [
+      { name:"Gato-Vaca", muscles:"Columna · Movilidad", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/174.gif", tips:["En cuatro apoyos","Gato: espalda hacia arriba","Vaca: panza hacia abajo — lento y fluido"] },
+      { name:"Rotación torácica", muscles:"Columna torácica · Movilidad", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/174.gif", tips:["En cuatro apoyos","Mano detrás de la cabeza","Rotás el codo hacia el techo"] },
+      { name:"Estiramiento de cadera", muscles:"Cadera · Piriforme", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/136.gif", tips:["Pierna delantera cruzada en el piso","Torso se inclina hacia adelante","Mantenés 30-60 segundos"] },
+      { name:"Respiración 4-7-8", muscles:"Sistema nervioso · Relajación", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/174.gif", tips:["Inhalás 4 segundos","Retenés 7 segundos","Exhalás 8 segundos"] },
+    ]
+  }
+};
+
+// Tiempos de descanso por nivel y género (segundos)
+const REST_TIMES = {
+  hombre: { Principiante:90, Intermedio:120, Avanzado:150, Experto:180, Recuperacion:60 },
+  mujer:  { Principiante:75, Intermedio:100, Avanzado:120, Experto:150, Recuperacion:50 }
+};
+const WORK_TIME = { Principiante:40, Intermedio:45, Avanzado:50, Experto:60, Recuperacion:30 };
+
+// ─── ESTADO DE LA APP ─────────────────────────────────────────────
+let profile = JSON.parse(localStorage.getItem('atProfile') || 'null');
+let sessionData = {
+  zona: null, nivel: null, qty: 6, exercises: [],
+  currentExercise: 0, currentSerie: 0, totalSeries: 3,
+  phase: 'work', // work | rest | warmup | stretch
+  timeLeft: 0, totalTime: 0, paused: false,
+  sessionStartTime: null, completedSeries: 0
+};
+let timerInterval = null;
+let wakeLock = null;
+let showGifs = true;
+let showRestPopup = true;
+let gymMode = false;
+
+// ─── NAVEGACIÓN ───────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 'home') updateHome();
+  if (id === 'config') updateConfig();
+  if (id === 'presession') updatePresession();
+}
+
+// ─── SPLASH → ONBOARDING / HOME ───────────────────────────────────
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    if (profile) {
+      showScreen('home');
+    } else {
+      showScreen('onboarding');
+    }
+  }, 2200);
+});
+
+// ─── ONBOARDING ───────────────────────────────────────────────────
+let selectedGender = null;
+
+function selectGender(g, btn) {
+  selectedGender = g;
+  document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  checkObForm();
+}
+
+function checkObForm() {
+  const nivel = document.getElementById('ob-nivel').value;
+  const btn = document.getElementById('ob-submit');
+  btn.disabled = !(selectedGender && nivel);
+}
+
+['ob-nivel','ob-zona','ob-altura','ob-edad'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('change', checkObForm);
+});
+
+function completeOnboarding() {
+  profile = {
+    name: document.getElementById('ob-name').value.trim() || null,
+    gender: selectedGender,
+    altura: parseInt(document.getElementById('ob-altura').value) || 170,
+    edad: parseInt(document.getElementById('ob-edad').value) || 25,
+    nivel: document.getElementById('ob-nivel').value,
+    zona: document.getElementById('ob-zona').value || 'Tren Superior',
+    lastSession: null
+  };
+  localStorage.setItem('atProfile', JSON.stringify(profile));
+  showScreen('presession');
+}
+
+// ─── HOME ─────────────────────────────────────────────────────────
+function updateHome() {
+  if (!profile) return;
+  const name = profile.name ? `¡Hola, ${profile.name}!` : '¡Hola!';
+  document.getElementById('home-greeting').textContent = name;
+  const last = document.getElementById('home-last');
+  if (profile.lastSession) {
+    last.textContent = `Última sesión: ${profile.lastSession}`;
+    last.style.display = 'block';
+  }
+}
+
+// ─── PRE-SESIÓN ───────────────────────────────────────────────────
+function updatePresession() {
+  if (!profile) return;
+  // Pre-select zona preferida
+  document.querySelectorAll('.zone-card').forEach(c => {
+    if (c.dataset.zona === profile.zona) {
+      c.classList.add('selected');
+      sessionData.zona = profile.zona;
+    }
+  });
+  // Default qty = 6
+  selectQtyByValue(6);
+}
+
+function selectZone(card) {
+  document.querySelectorAll('.zone-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  sessionData.zona = card.dataset.zona;
+}
+
+function selectQty(btn) {
+  document.querySelectorAll('.qty-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  sessionData.qty = parseInt(btn.dataset.qty);
+}
+
+function selectQtyByValue(val) {
+  document.querySelectorAll('.qty-btn').forEach(btn => {
+    btn.classList.toggle('selected', parseInt(btn.dataset.qty) === val);
+  });
+  sessionData.qty = val;
+}
+
+// ─── INICIAR SESIÓN ───────────────────────────────────────────────
+function startSession() {
+  if (!sessionData.zona) { alert('Elegí una zona primero'); return; }
+  const nivel = profile.nivel;
+  const zona = sessionData.zona;
+  let pool = (EXERCISES[zona] && EXERCISES[zona][nivel])
+    ? EXERCISES[zona][nivel]
+    : (EXERCISES[zona] && EXERCISES[zona]["Todos los niveles"])
+    ? EXERCISES[zona]["Todos los niveles"]
+    : [];
+  if (!pool.length) pool = Object.values(EXERCISES[zona])[0] || [];
+
+  // Seleccionar ejercicios (shuffle + slice)
+  const shuffled = [...pool].sort(() => Math.random() - 0.5);
+  sessionData.exercises = shuffled.slice(0, Math.min(sessionData.qty, shuffled.length));
+  sessionData.nivel = nivel;
+  sessionData.currentExercise = 0;
+  sessionData.currentSerie = 1;
+  sessionData.totalSeries = nivel === 'Principiante' ? 3 : nivel === 'Intermedio' ? 3 : nivel === 'Avanzado' ? 4 : 5;
+  sessionData.completedSeries = 0;
+  sessionData.sessionStartTime = Date.now();
+  sessionData.paused = false;
+  sessionData.phase = 'work';
+
+  requestWakeLock();
+  showScreen('session');
+  startPhase('work');
+}
+
+// ─── MOTOR DEL CRONÓMETRO ─────────────────────────────────────────
+function startPhase(phase) {
+  clearInterval(timerInterval);
+  sessionData.phase = phase;
+  sessionData.paused = false;
+
+  const nivel = sessionData.nivel || 'Principiante';
+  const gender = profile?.gender || 'hombre';
+  const ex = sessionData.exercises[sessionData.currentExercise];
+
+  let duration;
+  if (phase === 'work') {
+    duration = WORK_TIME[nivel] || 40;
+  } else {
+    duration = REST_TIMES[gender][nivel] || 90;
+  }
+
+  sessionData.timeLeft = duration;
+  sessionData.totalTime = duration;
+
+  updateSessionUI(phase, ex);
+  updateTimerDisplay();
+  updateProgress();
+
+  timerInterval = setInterval(() => {
+    if (sessionData.paused) return;
+    sessionData.timeLeft--;
+
+    // Aviso amarillo
+    if (sessionData.timeLeft === 10) setTimerColor('yellow');
+    updateTimerDisplay();
+
+    if (sessionData.timeLeft <= 0) {
+      clearInterval(timerInterval);
+      advanceSession();
+    }
+  }, 1000);
+}
+
+function advanceSession() {
+  const sd = sessionData;
+  if (sd.phase === 'work') {
+    sd.completedSeries++;
+    if (sd.currentSerie < sd.totalSeries) {
+      sd.currentSerie++;
+      startPhase('rest');
+    } else {
+      // Ejercicio completo
+      sd.currentExercise++;
+      sd.currentSerie = 1;
+      if (sd.currentExercise < sd.exercises.length) {
+        startPhase('rest');
+      } else {
+        endSession();
+      }
+    }
+  } else {
+    startPhase('work');
+  }
+}
+
+function updateSessionUI(phase, ex) {
+  const sessionEl = document.getElementById('session');
+  sessionEl.className = 'screen active';
+
+  const gifWrap = document.getElementById('gif-wrap');
+  const tipsWrap = document.getElementById('tips-wrap');
+
+  if (phase === 'work') {
+    document.getElementById('phase-label').textContent = 'TRABAJANDO';
+    document.getElementById('timer-unit').textContent = 'TRABAJANDO';
+    document.getElementById('exercise-name').textContent = ex?.name || '';
+    document.getElementById('exercise-muscles').textContent = ex?.muscles || '';
+    setTimerColor('green');
+    if (gymMode) sessionEl.classList.add('phase-work');
+    gifWrap.classList.remove('visible');
+    tipsWrap.classList.remove('visible');
+  } else {
+    // Descanso — mostrar GIF y tips del próximo ejercicio
+    const nextEx = sessionData.exercises[sessionData.currentExercise] || ex;
+    document.getElementById('phase-label').textContent = 'DESCANSANDO';
+    document.getElementById('timer-unit').textContent = 'DESCANSO';
+    document.getElementById('exercise-name').textContent = nextEx?.name || '';
+    document.getElementById('exercise-muscles').textContent = nextEx?.muscles || '';
+    setTimerColor('red');
+    if (gymMode) sessionEl.classList.add('phase-rest');
+
+    if (showGifs && nextEx?.gif) {
+      document.getElementById('exercise-gif').src = nextEx.gif;
+      gifWrap.classList.add('visible');
+    }
+    if (nextEx?.tips) {
+      document.getElementById('tips-content').innerHTML =
+        nextEx.tips.map(t => `<div class="tips-session-item">${t}</div>`).join('');
+      tipsWrap.classList.add('visible');
+    }
+  }
+}
+
+function setTimerColor(color) {
+  const ring = document.getElementById('timer-ring');
+  const num = document.getElementById('timer-display');
+  const colors = {
+    green:  { stroke: '#2ecc71', text: '#2ecc71' },
+    red:    { stroke: '#e74c3c', text: '#e74c3c' },
+    yellow: { stroke: '#f39c12', text: '#f39c12' },
+    blue:   { stroke: '#5d6d7e', text: '#5d6d7e' }
+  };
+  const c = colors[color] || colors.green;
+  ring.style.stroke = c.stroke;
+  num.style.color = c.text;
+}
+
+function updateTimerDisplay() {
+  const t = sessionData.timeLeft;
+  const m = Math.floor(t / 60);
+  const s = t % 60;
+  document.getElementById('timer-display').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+
+  // Anillo
+  const pct = sessionData.timeLeft / sessionData.totalTime;
+  const circ = 2 * Math.PI * 100;
+  document.getElementById('timer-ring').style.strokeDashoffset = circ * (1 - pct);
+}
+
+function updateProgress() {
+  const sd = sessionData;
+  const totalSteps = sd.exercises.length * sd.totalSeries;
+  const done = sd.completedSeries;
+  const pct = totalSteps > 0 ? (done / totalSteps) * 100 : 0;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent =
+    `Serie ${sd.currentSerie} de ${sd.totalSeries} · Ejercicio ${sd.currentExercise + 1} de ${sd.exercises.length}`;
+}
+
+// ─── CONTROLES ────────────────────────────────────────────────────
+function togglePause() {
+  sessionData.paused = !sessionData.paused;
+  const btn = document.getElementById('pause-btn');
+  if (sessionData.paused) {
+    btn.textContent = '▶ Reanudar';
+    setTimerColor('blue');
+    document.getElementById('session').classList.add('phase-pause');
+  } else {
+    btn.textContent = '⏸ Pausar';
+    setTimerColor(sessionData.phase === 'work' ? 'green' : 'red');
+    document.getElementById('session').classList.remove('phase-pause');
+  }
+}
+
+function skipPhase() {
+  if (sessionData.phase === 'rest' && showRestPopup) {
+    document.getElementById('skip-popup').classList.add('visible');
+  } else {
+    clearInterval(timerInterval);
+    advanceSession();
+  }
+}
+
+function closeSkipPopup(skip) {
+  document.getElementById('skip-popup').classList.remove('visible');
+  if (skip) {
+    clearInterval(timerInterval);
+    advanceSession();
+  }
+}
+
+function closeCancelPopup(cancel) {
+  document.getElementById('cancel-popup').classList.remove('visible');
+  if (cancel) {
+    clearInterval(timerInterval);
+    releaseWakeLock();
+    endSession();
+  }
+}
+
+// ─── FIN DE SESIÓN ────────────────────────────────────────────────
+function endSession() {
+  clearInterval(timerInterval);
+  releaseWakeLock();
+
+  const elapsed = Math.floor((Date.now() - sessionData.sessionStartTime) / 1000);
+  const m = Math.floor(elapsed / 60);
+  const s = elapsed % 60;
+
+  // MET aproximado según nivel
+  const mets = { Principiante:4, Intermedio:5.5, Avanzado:7, Experto:8, Recuperacion:3 };
+  const met = mets[sessionData.nivel] || 5;
+  const peso = profile?.altura ? Math.round(profile.altura * 0.45 - 10) : 70;
+  const cals = Math.round((met * peso * elapsed) / 3600);
+
+  document.getElementById('sum-cals').textContent = cals;
+  document.getElementById('sum-time').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+  document.getElementById('sum-series').textContent = sessionData.completedSeries;
+  document.getElementById('sum-exercises').textContent = sessionData.currentExercise;
+  document.getElementById('summary-sub').textContent = `${sessionData.zona} · ${sessionData.nivel}`;
+
+  // Guardar última sesión
+  const now = new Date();
+  const days = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  profile.lastSession = `${days[now.getDay()]}, ${m} min`;
+  localStorage.setItem('atProfile', JSON.stringify(profile));
+
+  showScreen('summary');
+}
+
+function shareSession() {
+  const text = `Completé una sesión de ${sessionData.zona} en A·Tiempo! 💪\n${document.getElementById('sum-cals').textContent} kcal · ${document.getElementById('sum-time').textContent} min`;
+  if (navigator.share) {
+    navigator.share({ title: 'A·Tiempo', text });
+  } else {
+    navigator.clipboard?.writeText(text).then(() => alert('Resumen copiado al portapapeles'));
+  }
+}
+
+// ─── CONFIGURACIÓN ────────────────────────────────────────────────
+function updateConfig() {
+  if (!profile) return;
+  document.getElementById('cfg-name').textContent = profile.name || '—';
+  document.getElementById('cfg-gender').textContent = profile.gender === 'hombre' ? 'Hombre' : 'Mujer';
+  document.getElementById('cfg-nivel').textContent = profile.nivel || '—';
+  document.getElementById('cfg-zona').textContent = profile.zona || '—';
+}
+
+function toggleGym(btn) {
+  gymMode = !gymMode;
+  btn.classList.toggle('on', gymMode);
+}
+
+function toggleGifs(btn) {
+  showGifs = !showGifs;
+  btn.classList.toggle('on', showGifs);
+}
+
+function togglePopup(btn) {
+  showRestPopup = !showRestPopup;
+  btn.classList.toggle('on', showRestPopup);
+}
+
+// ─── WAKE LOCK ────────────────────────────────────────────────────
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+    }
+  } catch(e) { console.log('Wake Lock no disponible'); }
+}
+
+function releaseWakeLock() {
+  if (wakeLock) { wakeLock.release(); wakeLock = null; }
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && timerInterval) requestWakeLock();
+});
+</script>
+</body>
+</html>
