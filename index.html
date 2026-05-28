@@ -956,30 +956,27 @@ function updateConfig() {
 }
 
 // ── SWIPE BACK GESTURE ───────────────────────────────────────────
+const NAV_HISTORY = [];
+const _origShow = showScreen;
+
+function showScreen(id) {
+  const current = document.querySelector('.screen.active');
+  if (current && current.id !== id) NAV_HISTORY.push(current.id);
+  _origShow(id);
+}
+
 (function() {
-  const HISTORY = [];
-  const origShow = window.showScreen;
-
-  window.showScreen = function(id) {
-    const current = document.querySelector('.screen.active');
-    if (current && current.id !== id) HISTORY.push(current.id);
-    origShow(id);
-  };
-
   let touchStartX = 0, touchStartY = 0;
-
   document.addEventListener('touchstart', e => {
     touchStartX = e.touches[0].clientX;
     touchStartY = e.touches[0].clientY;
   }, { passive: true });
-
   document.addEventListener('touchend', e => {
     const dx = e.changedTouches[0].clientX - touchStartX;
     const dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
-    // Swipe derecha: dx > 80px, más horizontal que vertical, desde el borde izquierdo
-    if (dx > 80 && dy < 60 && touchStartX < 50 && HISTORY.length > 0) {
-      const prev = HISTORY.pop();
-      origShow(prev);
+    if (dx > 80 && dy < 60 && touchStartX < 50 && NAV_HISTORY.length > 0) {
+      const prev = NAV_HISTORY.pop();
+      _origShow(prev);
     }
   }, { passive: true });
 })();
