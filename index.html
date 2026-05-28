@@ -617,6 +617,7 @@ const REST_TIMES = {
 const WORK_TIME = { Principiante:40, Intermedio:45, Avanzado:50, Experto:60, Recuperacion:30 };
 
 // ── ESTADO ───────────────────────────────────────────────────────
+const NAV_HISTORY = [];
 let profile = JSON.parse(localStorage.getItem('atProfile') || 'null');
 let SD = { zona:null, nivel:null, qty:6, exercises:[], currentEx:0, currentSerie:1, totalSeries:3, completedSeries:0, phase:'work', timeLeft:0, totalTime:0, paused:false, startTime:null };
 let timerInterval = null;
@@ -628,7 +629,9 @@ let selectedGender = null;
 const PK = { altura:170, edad:25, peso:70, nivel:'Principiante', zona:'Tren Superior', qty:6 };
 
 // ── NAVEGACIÓN ───────────────────────────────────────────────────
-function showScreen(id) {
+function showScreen(id, isBack = false) {
+  const current = document.querySelector('.screen.active');
+  if (current && current.id !== id && !isBack) NAV_HISTORY.push(current.id);
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   if (id === 'home') updateHome();
@@ -956,15 +959,6 @@ function updateConfig() {
 }
 
 // ── SWIPE BACK GESTURE ───────────────────────────────────────────
-const NAV_HISTORY = [];
-const _origShow = showScreen;
-
-function showScreen(id) {
-  const current = document.querySelector('.screen.active');
-  if (current && current.id !== id) NAV_HISTORY.push(current.id);
-  _origShow(id);
-}
-
 (function() {
   let touchStartX = 0, touchStartY = 0;
   document.addEventListener('touchstart', e => {
@@ -976,7 +970,7 @@ function showScreen(id) {
     const dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
     if (dx > 80 && dy < 60 && touchStartX < 50 && NAV_HISTORY.length > 0) {
       const prev = NAV_HISTORY.pop();
-      _origShow(prev);
+      showScreen(prev, true); // true = don't push to history
     }
   }, { passive: true });
 })();
