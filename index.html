@@ -341,29 +341,86 @@ html, body {
 .zone-icon { font-size: 28px; }
 .zone-name { font-size: 14px; font-weight: 700; }
 .zone-desc { font-size: 11px; color: var(--text-muted); }
-.qty-row {
-  display: flex;
-  gap: 8px;
+.qty-picker-wrap {
   width: 100%;
   margin-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 }
-.qty-btn {
-  flex: 1;
+.qty-picker-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.qty-picker {
+  width: 100%;
+  height: 200px;
+  position: relative;
+  overflow: hidden;
   background: var(--surface);
-  border: 2px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 14px 8px;
-  font-size: 18px;
-  font-weight: 700;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+.qty-picker::before,
+.qty-picker::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: 70px;
+  z-index: 2;
+  pointer-events: none;
+}
+.qty-picker::before {
+  top: 0;
+  background: linear-gradient(to bottom, var(--surface) 0%, transparent 100%);
+}
+.qty-picker::after {
+  bottom: 0;
+  background: linear-gradient(to top, var(--surface) 0%, transparent 100%);
+}
+.qty-picker-selector {
+  position: absolute;
+  left: 16px; right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 56px;
+  border-top: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
+  border-radius: 10px;
+  z-index: 1;
+  pointer-events: none;
+  background: rgba(231,76,60,0.06);
+}
+.qty-picker-list {
+  position: absolute;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.15s ease;
+}
+.qty-picker-item {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  font-weight: 800;
   font-family: 'DM Mono', monospace;
   color: var(--text-muted);
-  cursor: pointer;
-  transition: all 0.2s;
+  width: 100%;
+  transition: color 0.2s, font-size 0.2s;
+  flex-shrink: 0;
 }
-.qty-btn.selected {
-  border-color: var(--accent);
+.qty-picker-item.active {
   color: var(--text);
-  background: rgba(231,76,60,0.08);
+  font-size: 44px;
 }
 .ps-start {
   width: 100%;
@@ -810,6 +867,123 @@ html, body {
 }
 .toggle.on::after { transform: translateX(18px); }
 
+/* ── PREVIEW EJERCICIO ───────────────────────────────────────────── */
+#preview {
+  justify-content: flex-start;
+  padding: 52px 20px 40px;
+  gap: 0;
+  background: var(--bg);
+}
+.preview-chip {
+  align-self: flex-start;
+  background: rgba(231,76,60,0.12);
+  border: 1px solid rgba(231,76,60,0.25);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+.preview-exname {
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: -1.5px;
+  margin-bottom: 4px;
+  align-self: flex-start;
+  line-height: 1.1;
+}
+.preview-muscles {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  align-self: flex-start;
+}
+.preview-gif-box {
+  width: 100%;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+  position: relative;
+}
+.preview-gif-box img {
+  width: 100%;
+  height: 240px;
+  object-fit: contain;
+  background: #0d0d0d;
+  display: block;
+  min-height: 240px;
+}
+.preview-gif-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(46,204,113,0.9);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+.preview-tips {
+  width: 100%;
+  background: rgba(243,156,18,0.05);
+  border: 1px solid rgba(243,156,18,0.15);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin-bottom: 20px;
+}
+.preview-tips-title {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--yellow);
+  margin-bottom: 10px;
+}
+.preview-tip-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: #ccc;
+  line-height: 1.4;
+}
+.preview-tip-item:last-child { margin-bottom: 0; }
+.preview-tip-arrow { color: var(--yellow); flex-shrink: 0; margin-top: 1px; }
+.preview-progress {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  margin-bottom: 16px;
+  font-family: 'DM Mono', monospace;
+}
+.preview-start-btn {
+  width: 100%;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  font-size: 17px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 800;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 8px 28px var(--red-glow);
+  transition: transform 0.15s, box-shadow 0.15s;
+  letter-spacing: -0.3px;
+}
+.preview-start-btn:active {
+  transform: scale(0.98);
+  box-shadow: 0 4px 14px var(--red-glow);
+}
+
 /* ── UTILIDADES ──────────────────────────────────────────────────── */
 .hidden { display: none !important; }
 </style>
@@ -926,15 +1100,38 @@ html, body {
   </div>
 
   <div class="ps-label">Cantidad de ejercicios</div>
-  <div class="qty-row" id="qty-row">
-    <button class="qty-btn" data-qty="4" onclick="selectQty(this)">4</button>
-    <button class="qty-btn" data-qty="5" onclick="selectQty(this)">5</button>
-    <button class="qty-btn selected" data-qty="6" onclick="selectQty(this)">6</button>
-    <button class="qty-btn" data-qty="7" onclick="selectQty(this)">7</button>
-    <button class="qty-btn" data-qty="8" onclick="selectQty(this)">8</button>
+  <div class="qty-picker-wrap">
+    <div class="qty-picker" id="qty-picker">
+      <div class="qty-picker-selector"></div>
+      <div class="qty-picker-list" id="qty-picker-list">
+        <div class="qty-picker-item" data-val="4">4</div>
+        <div class="qty-picker-item" data-val="5">5</div>
+        <div class="qty-picker-item active" data-val="6">6</div>
+        <div class="qty-picker-item" data-val="7">7</div>
+        <div class="qty-picker-item" data-val="8">8</div>
+      </div>
+    </div>
+    <div class="qty-picker-label">deslizá arriba o abajo</div>
   </div>
 
   <button class="ps-start" onclick="startSession()">Arrancar →</button>
+</div>
+
+<!-- ── PREVIEW EJERCICIO ─────────────────────────────────────────── -->
+<div id="preview" class="screen">
+  <div class="preview-chip" id="preview-chip">Ejercicio 1 de 6</div>
+  <div class="preview-exname" id="preview-exname">Sentadilla</div>
+  <div class="preview-muscles" id="preview-muscles">Cuádriceps · Glúteos · Core</div>
+  <div class="preview-gif-box">
+    <img id="preview-gif" src="" alt="Ejercicio"/>
+    <span class="preview-gif-badge">● Animado</span>
+  </div>
+  <div class="preview-tips">
+    <div class="preview-tips-title">⚡ Técnica clave</div>
+    <div id="preview-tips-content"></div>
+  </div>
+  <div class="preview-progress" id="preview-progress">Serie 1 de 3 · Ejercicio 1 de 6</div>
+  <button class="preview-start-btn" onclick="confirmStartExercise()">Entendido, empezar →</button>
 </div>
 
 <!-- ── SESIÓN ACTIVA ─────────────────────────────────────────────── -->
@@ -956,9 +1153,9 @@ html, body {
     </div>
   </div>
 
-  <div class="exercise-gif-wrap" id="gif-wrap">
+  <div class="exercise-gif-wrap visible" id="gif-wrap">
     <img id="exercise-gif" src="" alt="Ejercicio" onerror="this.parentElement.style.display='none'"/>
-    <span class="gif-badge-session">● EN VIVO</span>
+    <span class="gif-badge-session" id="gif-phase-badge">● TRABAJANDO</span>
   </div>
 
   <div class="tips-session" id="tips-wrap">
@@ -1101,6 +1298,150 @@ html, body {
 </div>
 
 <script>
+const GIF_MAP = {
+  "Flexiones de rodillas": "https://cdn.jefit.com/assets/img/exercises/gifs/84.gif",
+  "Flexiones completas": "https://cdn.jefit.com/assets/img/exercises/gifs/84.gif",
+  "Flexiones con palmada": "https://cdn.jefit.com/assets/img/exercises/gifs/86.gif",
+  "Flexiones arqueras": "https://cdn.jefit.com/assets/img/exercises/gifs/85.gif",
+  "Remo en banco": "https://cdn.jefit.com/assets/img/exercises/gifs/90.gif",
+  "Remo con barra": "https://cdn.jefit.com/assets/img/exercises/gifs/95.gif",
+  "Remo con mancuerna pesada": "https://cdn.jefit.com/assets/img/exercises/gifs/90.gif",
+  "Remo Pendlay": "https://cdn.jefit.com/assets/img/exercises/gifs/95.gif",
+  "Remo agarre supino con barra": "https://cdn.jefit.com/assets/img/exercises/gifs/94.gif",
+  "Remo al mentón": "https://cdn.jefit.com/assets/img/exercises/gifs/96.gif",
+  "Curl de bíceps": "https://cdn.jefit.com/assets/img/exercises/gifs/11.gif",
+  "Curl martillo": "https://cdn.jefit.com/assets/img/exercises/gifs/14.gif",
+  "Curl concentrado": "https://cdn.jefit.com/assets/img/exercises/gifs/13.gif",
+  "Curl de bíceps con barra": "https://cdn.jefit.com/assets/img/exercises/gifs/10.gif",
+  "Elevaciones laterales": "https://cdn.jefit.com/assets/img/exercises/gifs/42.gif",
+  "Elevaciones frontales": "https://cdn.jefit.com/assets/img/exercises/gifs/44.gif",
+  "Superman": "https://cdn.jefit.com/assets/img/exercises/gifs/174.gif",
+  "Apertura de pecho en piso": "https://cdn.jefit.com/assets/img/exercises/gifs/29.gif",
+  "Press de hombro sentado": "https://cdn.jefit.com/assets/img/exercises/gifs/39.gif",
+  "Press de banca": "https://cdn.jefit.com/assets/img/exercises/gifs/28.gif",
+  "Press de banca con barra": "https://cdn.jefit.com/assets/img/exercises/gifs/27.gif",
+  "Press de banca pesado": "https://cdn.jefit.com/assets/img/exercises/gifs/27.gif",
+  "Press Arnold": "https://cdn.jefit.com/assets/img/exercises/gifs/40.gif",
+  "Press militar": "https://cdn.jefit.com/assets/img/exercises/gifs/39.gif",
+  "Press militar con barra de pie": "https://cdn.jefit.com/assets/img/exercises/gifs/38.gif",
+  "Extensión de tríceps": "https://cdn.jefit.com/assets/img/exercises/gifs/56.gif",
+  "Fondos en silla (tríceps)": "https://cdn.jefit.com/assets/img/exercises/gifs/59.gif",
+  "Fondos en silla": "https://cdn.jefit.com/assets/img/exercises/gifs/59.gif",
+  "Fondos en paralelas": "https://cdn.jefit.com/assets/img/exercises/gifs/60.gif",
+  "Face pull con banda": "https://cdn.jefit.com/assets/img/exercises/gifs/46.gif",
+  "Dominadas": "https://cdn.jefit.com/assets/img/exercises/gifs/100.gif",
+  "Dominadas con peso": "https://cdn.jefit.com/assets/img/exercises/gifs/100.gif",
+  "Rotaciones de hombro": "https://cdn.jefit.com/assets/img/exercises/gifs/46.gif",
+  "Retracción escapular": "https://cdn.jefit.com/assets/img/exercises/gifs/174.gif",
+  "Sentadilla": "https://cdn.jefit.com/assets/img/exercises/gifs/122.gif",
+  "Sentadilla con peso corporal": "https://cdn.jefit.com/assets/img/exercises/gifs/122.gif",
+  "Sentadilla con mancuernas": "https://cdn.jefit.com/assets/img/exercises/gifs/122.gif",
+  "Sentadilla con barra": "https://cdn.jefit.com/assets/img/exercises/gifs/120.gif",
+  "Sentadilla sumo": "https://cdn.jefit.com/assets/img/exercises/gifs/124.gif",
+  "Sentadilla búlgara": "https://cdn.jefit.com/assets/img/exercises/gifs/113.gif",
+  "Sentadilla frontal con barra": "https://cdn.jefit.com/assets/img/exercises/gifs/121.gif",
+  "Sentadilla pausa": "https://cdn.jefit.com/assets/img/exercises/gifs/120.gif",
+  "Sentadilla búlgara con barra": "https://cdn.jefit.com/assets/img/exercises/gifs/113.gif",
+  "Sentadilla búlgara pesada": "https://cdn.jefit.com/assets/img/exercises/gifs/113.gif",
+  "Estocada alternada": "https://cdn.jefit.com/assets/img/exercises/gifs/111.gif",
+  "Estocada caminando": "https://cdn.jefit.com/assets/img/exercises/gifs/112.gif",
+  "Estocada inversa con barra": "https://cdn.jefit.com/assets/img/exercises/gifs/111.gif",
+  "Estocada lateral con mancuerna": "https://cdn.jefit.com/assets/img/exercises/gifs/114.gif",
+  "Puente de glúteos": "https://cdn.jefit.com/assets/img/exercises/gifs/136.gif",
+  "Puente de glúteos con mancuerna": "https://cdn.jefit.com/assets/img/exercises/gifs/136.gif",
+  "Puente de glúteos lento": "https://cdn.jefit.com/assets/img/exercises/gifs/136.gif",
+  "Hip thrust": "https://cdn.jefit.com/assets/img/exercises/gifs/137.gif",
+  "Hip thrust con barra": "https://cdn.jefit.com/assets/img/exercises/gifs/137.gif",
+  "Hip thrust barra pesada": "https://cdn.jefit.com/assets/img/exercises/gifs/137.gif",
+  "Peso muerto convencional": "https://cdn.jefit.com/assets/img/exercises/gifs/128.gif",
+  "Peso muerto rumano": "https://cdn.jefit.com/assets/img/exercises/gifs/130.gif",
+  "Peso muerto rumano con mancuernas": "https://cdn.jefit.com/assets/img/exercises/gifs/130.gif",
+  "Peso muerto rumano con barra": "https://cdn.jefit.com/assets/img/exercises/gifs/131.gif",
+  "Peso muerto sumo": "https://cdn.jefit.com/assets/img/exercises/gifs/129.gif",
+  "Peso muerto a una pierna": "https://cdn.jefit.com/assets/img/exercises/gifs/130.gif",
+  "Peso muerto déficit": "https://cdn.jefit.com/assets/img/exercises/gifs/128.gif",
+  "Elevación de pantorrillas": "https://cdn.jefit.com/assets/img/exercises/gifs/145.gif",
+  "Elevación de pantorrillas de pie": "https://cdn.jefit.com/assets/img/exercises/gifs/145.gif",
+  "Elevación de pantorrillas con mancuerna": "https://cdn.jefit.com/assets/img/exercises/gifs/145.gif",
+  "Elevación de pantorrillas con barra": "https://cdn.jefit.com/assets/img/exercises/gifs/145.gif",
+  "Elevación pantorrilla una pierna": "https://cdn.jefit.com/assets/img/exercises/gifs/145.gif",
+  "Patada de glúteo en cuadrupedia": "https://cdn.jefit.com/assets/img/exercises/gifs/136.gif",
+  "Abducción de cadera acostado": "https://cdn.jefit.com/assets/img/exercises/gifs/136.gif",
+  "Step up con mancuernas": "https://cdn.jefit.com/assets/img/exercises/gifs/119.gif",
+  "Step up con mancuernas pesadas": "https://cdn.jefit.com/assets/img/exercises/gifs/119.gif",
+  "Curl de isquiotibiales en piso": "https://cdn.jefit.com/assets/img/exercises/gifs/135.gif",
+  "Marcha en el lugar": "https://cdn.jefit.com/assets/img/exercises/gifs/155.gif",
+  "Marcha lenta en el lugar": "https://cdn.jefit.com/assets/img/exercises/gifs/155.gif",
+  "Jumping Jacks": "https://cdn.jefit.com/assets/img/exercises/gifs/156.gif",
+  "Jumping jacks": "https://cdn.jefit.com/assets/img/exercises/gifs/156.gif",
+  "Jumping jacks rápido": "https://cdn.jefit.com/assets/img/exercises/gifs/156.gif",
+  "Step lateral": "https://cdn.jefit.com/assets/img/exercises/gifs/155.gif",
+  "Skipping": "https://cdn.jefit.com/assets/img/exercises/gifs/157.gif",
+  "Skipping (rodillas al pecho rápido)": "https://cdn.jefit.com/assets/img/exercises/gifs/157.gif",
+  "Skipping alto con brazos": "https://cdn.jefit.com/assets/img/exercises/gifs/157.gif",
+  "Skipping máxima velocidad": "https://cdn.jefit.com/assets/img/exercises/gifs/157.gif",
+  "Rodillas al pecho": "https://cdn.jefit.com/assets/img/exercises/gifs/157.gif",
+  "Talones al glúteo lento": "https://cdn.jefit.com/assets/img/exercises/gifs/155.gif",
+  "Boxeo en el aire": "https://cdn.jefit.com/assets/img/exercises/gifs/155.gif",
+  "Boxeo con desplazamiento": "https://cdn.jefit.com/assets/img/exercises/gifs/155.gif",
+  "Shadowboxing avanzado": "https://cdn.jefit.com/assets/img/exercises/gifs/155.gif",
+  "Burpee sin salto": "https://cdn.jefit.com/assets/img/exercises/gifs/160.gif",
+  "Burpee completo": "https://cdn.jefit.com/assets/img/exercises/gifs/160.gif",
+  "Burpee con dominada": "https://cdn.jefit.com/assets/img/exercises/gifs/160.gif",
+  "Burpee con salto lateral": "https://cdn.jefit.com/assets/img/exercises/gifs/160.gif",
+  "Montañero": "https://cdn.jefit.com/assets/img/exercises/gifs/161.gif",
+  "Montañero rápido": "https://cdn.jefit.com/assets/img/exercises/gifs/161.gif",
+  "Montañero con giro (cross body)": "https://cdn.jefit.com/assets/img/exercises/gifs/161.gif",
+  "Saltos laterales": "https://cdn.jefit.com/assets/img/exercises/gifs/158.gif",
+  "Split jumps (saltos de tijera)": "https://cdn.jefit.com/assets/img/exercises/gifs/158.gif",
+  "Salto al cajón (box jump)": "https://cdn.jefit.com/assets/img/exercises/gifs/158.gif",
+  "Salto al cajón con sentadilla": "https://cdn.jefit.com/assets/img/exercises/gifs/158.gif",
+  "Salto de rana (frog jump)": "https://cdn.jefit.com/assets/img/exercises/gifs/158.gif",
+  "Salto con sentadilla 180°": "https://cdn.jefit.com/assets/img/exercises/gifs/158.gif",
+  "Sentadilla + salto suave": "https://cdn.jefit.com/assets/img/exercises/gifs/158.gif",
+  "Sentadilla + salto": "https://cdn.jefit.com/assets/img/exercises/gifs/158.gif",
+  "Plancha sobre rodillas": "https://cdn.jefit.com/assets/img/exercises/gifs/168.gif",
+  "Plancha con toque de hombro": "https://cdn.jefit.com/assets/img/exercises/gifs/168.gif",
+  "Plancha dinámica (up-down)": "https://cdn.jefit.com/assets/img/exercises/gifs/168.gif",
+  "Plancha con remo (mancuerna)": "https://cdn.jefit.com/assets/img/exercises/gifs/168.gif",
+  "Sprint en el lugar máxima velocidad": "https://cdn.jefit.com/assets/img/exercises/gifs/157.gif",
+  "Gato-Vaca": "https://cdn.jefit.com/assets/img/exercises/gifs/174.gif",
+  "Rotación torácica": "https://cdn.jefit.com/assets/img/exercises/gifs/174.gif",
+  "Estiramiento de cadera (paloma)": "https://cdn.jefit.com/assets/img/exercises/gifs/136.gif",
+  "Estiramiento de cadera": "https://cdn.jefit.com/assets/img/exercises/gifs/136.gif",
+  "Respiración 4-7-8 acostado": "https://cdn.jefit.com/assets/img/exercises/gifs/174.gif",
+  "Respiración diafragmática": "https://cdn.jefit.com/assets/img/exercises/gifs/174.gif",
+  "Movilidad de cadera en cuadrupedia": "https://cdn.jefit.com/assets/img/exercises/gifs/136.gif",
+  "Movilidad de cuello": "https://cdn.jefit.com/assets/img/exercises/gifs/174.gif",
+  "Estiramiento de isquiotibiales acostado": "https://cdn.jefit.com/assets/img/exercises/gifs/135.gif",
+  "Estiramiento de cuádriceps de pie": "https://cdn.jefit.com/assets/img/exercises/gifs/145.gif",
+  "Estiramiento piriforme (figura 4)": "https://cdn.jefit.com/assets/img/exercises/gifs/136.gif",
+  "Estiramiento de isquios con banda": "https://cdn.jefit.com/assets/img/exercises/gifs/135.gif",
+  "Estiramiento flexor de cadera": "https://cdn.jefit.com/assets/img/exercises/gifs/111.gif",
+  "Estiramiento de tríceps": "https://cdn.jefit.com/assets/img/exercises/gifs/56.gif",
+  "Estiramiento de pectoral en piso": "https://cdn.jefit.com/assets/img/exercises/gifs/174.gif",
+  "Rodillo de espuma en espalda": "https://cdn.jefit.com/assets/img/exercises/gifs/174.gif",
+  "Caminata con respiración 4-4": "https://cdn.jefit.com/assets/img/exercises/gifs/155.gif",
+  "Círculos de hombros hacia atrás": "https://cdn.jefit.com/assets/img/exercises/gifs/174.gif",
+  "Postura de montaña con respiración": "https://cdn.jefit.com/assets/img/exercises/gifs/174.gif",
+  "Balanceo de brazos cruzados": "https://cdn.jefit.com/assets/img/exercises/gifs/174.gif",
+  "Estiramiento de cuello lento": "https://cdn.jefit.com/assets/img/exercises/gifs/174.gif",
+  "Rotación de cadera acostado": "https://cdn.jefit.com/assets/img/exercises/gifs/136.gif",
+  "Movilidad de tobillo en pared": "https://cdn.jefit.com/assets/img/exercises/gifs/145.gif",
+};
+
+function getGif(name) { 
+  return GIF_MAP[name] || GIF_MAP['Sentadilla'] || GIF_MAP['squat'] || Object.values(GIF_MAP)[0] || ''; 
+}
+function setGifSrc(elemId, name) {
+  const el = document.getElementById(elemId);
+  if (!el) return;
+  const src = getGif(name);
+  el.style.display = 'block';
+  el.src = src;
+}
+
+
 // ─── DATOS DE EJERCICIOS ──────────────────────────────────────────
 const EXERCISES = {
   "Tren Superior": {
@@ -1176,7 +1517,7 @@ const EXERCISES = {
     ],
     "Avanzado": [
       { name:"Burpee completo", muscles:"Cardio · Cuerpo completo", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/160.gif", tips:["Plancha completa en el piso","Salto máximo con brazos arriba","Aterrizás suave con rodillas dobladas"] },
-      { name:"Box Jump", muscles:"Cardio · Cuádriceps · Glúteos", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/158.gif", tips:["Posición atlética antes de saltar","Caés con las dos rodillas dobladas","Bajás caminando — no saltás abajo"] },
+      { name:"Box Jump", muscles:"Cardio · Cuádriceps · Glúteos", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/122.gif", tips:["Posición atlética antes de saltar","Caés con las dos rodillas dobladas","Bajás caminando — no saltás abajo"] },
       { name:"Montañero rápido", muscles:"Core · Cardio · Hombros", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/161.gif", tips:["Velocidad máxima manteniendo forma","Cadera baja y estable","Core apretado todo el tiempo"] },
     ],
   },
@@ -1185,7 +1526,7 @@ const EXERCISES = {
       { name:"Gato-Vaca", muscles:"Columna · Movilidad", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/174.gif", tips:["En cuatro apoyos","Gato: espalda hacia arriba","Vaca: panza hacia abajo — lento y fluido"] },
       { name:"Rotación torácica", muscles:"Columna torácica · Movilidad", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/174.gif", tips:["En cuatro apoyos","Mano detrás de la cabeza","Rotás el codo hacia el techo"] },
       { name:"Estiramiento de cadera", muscles:"Cadera · Piriforme", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/136.gif", tips:["Pierna delantera cruzada en el piso","Torso se inclina hacia adelante","Mantenés 30-60 segundos"] },
-      { name:"Respiración 4-7-8", muscles:"Sistema nervioso · Relajación", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/174.gif", tips:["Inhalás 4 segundos","Retenés 7 segundos","Exhalás 8 segundos"] },
+      { name:"Respiración 4-7-8", muscles:"Sistema nervioso · Relajación", gif:"https://cdn.jefit.com/assets/img/exercises/gifs/122.gif", tips:["Inhalás 4 segundos","Retenés 7 segundos","Exhalás 8 segundos"] },
     ]
   }
 };
@@ -1211,6 +1552,7 @@ let wakeLock = null;
 let showGifs = true;
 let showRestPopup = true;
 let gymMode = false;
+let skipPopupShownThisSession = false;
 
 // ─── NAVEGACIÓN ───────────────────────────────────────────────────
 function showScreen(id) {
@@ -1218,7 +1560,7 @@ function showScreen(id) {
   document.getElementById(id).classList.add('active');
   if (id === 'home') updateHome();
   if (id === 'config') updateConfig();
-  if (id === 'presession') updatePresession();
+  if (id === 'presession') { updatePresession(); initQtyPicker(sessionData.qty || 6); }
 }
 
 // ─── SPLASH → ONBOARDING / HOME ───────────────────────────────────
@@ -1282,15 +1624,21 @@ function updateHome() {
 // ─── PRE-SESIÓN ───────────────────────────────────────────────────
 function updatePresession() {
   if (!profile) return;
-  // Pre-select zona preferida
-  document.querySelectorAll('.zone-card').forEach(c => {
-    if (c.dataset.zona === profile.zona) {
-      c.classList.add('selected');
-      sessionData.zona = profile.zona;
-    }
-  });
-  // Default qty = 6
-  selectQtyByValue(6);
+  // Solo pre-seleccionar si no hay zona elegida aún
+  if (!sessionData.zona) {
+    document.querySelectorAll('.zone-card').forEach(c => {
+      c.classList.remove('selected');
+      if (c.dataset.zona === profile.zona) {
+        c.classList.add('selected');
+        sessionData.zona = profile.zona;
+      }
+    });
+  } else {
+    // Mantener la selección actual visual
+    document.querySelectorAll('.zone-card').forEach(c => {
+      c.classList.toggle('selected', c.dataset.zona === sessionData.zona);
+    });
+  }
 }
 
 function selectZone(card) {
@@ -1306,10 +1654,118 @@ function selectQty(btn) {
 }
 
 function selectQtyByValue(val) {
-  document.querySelectorAll('.qty-btn').forEach(btn => {
-    btn.classList.toggle('selected', parseInt(btn.dataset.qty) === val);
+  sessionData.qty = parseInt(val);
+  initQtyPicker(parseInt(val));
+}
+
+function updateQty(val) {
+  sessionData.qty = parseInt(val);
+  document.getElementById('qty-display').textContent = val;
+}
+
+// ─── DRUM ROLL PICKER ─────────────────────────────────────────────
+function initQtyPicker(initialVal = 6) {
+  const picker = document.getElementById('qty-picker');
+  const list   = document.getElementById('qty-picker-list');
+  if (!picker || !list) return;
+
+  const ITEM_H = 56;
+  const MIN = 4, MAX = 8;
+  const COUNT = MAX - MIN + 1;
+  // offset: posición 0 = item 4 centrado. Centro del picker = 100px (mitad de 200px)
+  // Para centrar el item idx: translateY = 100 - ITEM_H/2 - idx*ITEM_H
+  let currentIdx = initialVal - MIN; // 0-based index
+  let startY = 0, startOffset = 0, isDragging = false;
+  let currentOffset = getOffsetForIdx(currentIdx);
+
+  function getOffsetForIdx(idx) {
+    return 100 - ITEM_H / 2 - idx * ITEM_H;
+  }
+
+  function setOffset(offset, animate = false) {
+    if (animate) list.style.transition = 'transform 0.2s ease';
+    else list.style.transition = 'none';
+    list.style.transform = `translateY(${offset}px)`;
+  }
+
+  function updateActive(idx) {
+    document.querySelectorAll('.qty-picker-item').forEach((el, i) => {
+      el.classList.toggle('active', i === idx);
+    });
+    sessionData.qty = MIN + idx;
+  }
+
+  function snapToNearest(offset) {
+    // Calcular qué índice está más cerca del centro
+    let idx = Math.round((100 - ITEM_H / 2 - offset) / ITEM_H);
+    idx = Math.max(0, Math.min(COUNT - 1, idx));
+    currentIdx = idx;
+    currentOffset = getOffsetForIdx(idx);
+    setOffset(currentOffset, true);
+    updateActive(idx);
+    setTimeout(() => { list.style.transition = 'none'; }, 220);
+  }
+
+  // Touch events
+  picker.addEventListener('touchstart', e => {
+    isDragging = true;
+    startY = e.touches[0].clientY;
+    startOffset = currentOffset;
+    list.style.transition = 'none';
+  }, { passive: true });
+
+  picker.addEventListener('touchmove', e => {
+    if (!isDragging) return;
+    const dy = e.touches[0].clientY - startY;
+    const newOffset = startOffset + dy;
+    // Límites suaves
+    const minOff = getOffsetForIdx(COUNT - 1) - 20;
+    const maxOff = getOffsetForIdx(0) + 20;
+    currentOffset = Math.max(minOff, Math.min(maxOff, newOffset));
+    setOffset(currentOffset);
+    // Highlight item más cercano mientras arrastrás
+    let idx = Math.round((100 - ITEM_H / 2 - currentOffset) / ITEM_H);
+    idx = Math.max(0, Math.min(COUNT - 1, idx));
+    updateActive(idx);
+  }, { passive: true });
+
+  picker.addEventListener('touchend', () => {
+    isDragging = false;
+    snapToNearest(currentOffset);
   });
-  sessionData.qty = val;
+
+  // Mouse events (para desktop/testing)
+  picker.addEventListener('mousedown', e => {
+    isDragging = true;
+    startY = e.clientY;
+    startOffset = currentOffset;
+    list.style.transition = 'none';
+    picker.style.cursor = 'grabbing';
+  });
+
+  window.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    const dy = e.clientY - startY;
+    const newOffset = startOffset + dy;
+    const minOff = getOffsetForIdx(COUNT - 1) - 20;
+    const maxOff = getOffsetForIdx(0) + 20;
+    currentOffset = Math.max(minOff, Math.min(maxOff, newOffset));
+    setOffset(currentOffset);
+    let idx = Math.round((100 - ITEM_H / 2 - currentOffset) / ITEM_H);
+    idx = Math.max(0, Math.min(COUNT - 1, idx));
+    updateActive(idx);
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    picker.style.cursor = 'grab';
+    snapToNearest(currentOffset);
+  });
+
+  // Init
+  setOffset(currentOffset);
+  updateActive(currentIdx);
 }
 
 // ─── INICIAR SESIÓN ───────────────────────────────────────────────
@@ -1324,7 +1780,6 @@ function startSession() {
     : [];
   if (!pool.length) pool = Object.values(EXERCISES[zona])[0] || [];
 
-  // Seleccionar ejercicios (shuffle + slice)
   const shuffled = [...pool].sort(() => Math.random() - 0.5);
   sessionData.exercises = shuffled.slice(0, Math.min(sessionData.qty, shuffled.length));
   sessionData.nivel = nivel;
@@ -1335,8 +1790,38 @@ function startSession() {
   sessionData.sessionStartTime = Date.now();
   sessionData.paused = false;
   sessionData.phase = 'work';
+  skipPopupShownThisSession = false;
 
   requestWakeLock();
+  showPreview();
+}
+
+// ─── PREVIEW DE EJERCICIO ─────────────────────────────────────────
+function showPreview() {
+  const ex = sessionData.exercises[sessionData.currentExercise];
+  if (!ex) { startPhase('work'); return; }
+
+  const exNum = sessionData.currentExercise + 1;
+  const total = sessionData.exercises.length;
+  const serie = sessionData.currentSerie;
+  const totalSeries = sessionData.totalSeries;
+
+  document.getElementById('preview-chip').textContent = `Ejercicio ${exNum} de ${total}`;
+  document.getElementById('preview-exname').textContent = ex.name;
+  document.getElementById('preview-muscles').textContent = ex.muscles;
+  setGifSrc('preview-gif', ex.name);
+  document.getElementById('preview-progress').textContent =
+    `Serie ${serie} de ${totalSeries} · Ejercicio ${exNum} de ${total}`;
+
+  const tipsHTML = (ex.tips || [])
+    .map(t => `<div class="preview-tip-item"><span class="preview-tip-arrow">→</span>${t}</div>`)
+    .join('');
+  document.getElementById('preview-tips-content').innerHTML = tipsHTML;
+
+  showScreen('preview');
+}
+
+function confirmStartExercise() {
   showScreen('session');
   startPhase('work');
 }
@@ -1388,16 +1873,18 @@ function advanceSession() {
       sd.currentSerie++;
       startPhase('rest');
     } else {
-      // Ejercicio completo
       sd.currentExercise++;
       sd.currentSerie = 1;
       if (sd.currentExercise < sd.exercises.length) {
-        startPhase('rest');
+        // Mostrar preview del próximo ejercicio
+        showPreview();
       } else {
         endSession();
       }
     }
   } else {
+    // Termina el descanso → arrancar trabajo
+    showScreen('session');
     startPhase('work');
   }
 }
@@ -1408,6 +1895,7 @@ function updateSessionUI(phase, ex) {
 
   const gifWrap = document.getElementById('gif-wrap');
   const tipsWrap = document.getElementById('tips-wrap');
+  const badge = document.getElementById('gif-phase-badge');
 
   if (phase === 'work') {
     document.getElementById('phase-label').textContent = 'TRABAJANDO';
@@ -1416,10 +1904,22 @@ function updateSessionUI(phase, ex) {
     document.getElementById('exercise-muscles').textContent = ex?.muscles || '';
     setTimerColor('green');
     if (gymMode) sessionEl.classList.add('phase-work');
-    gifWrap.classList.remove('visible');
-    tipsWrap.classList.remove('visible');
+    if (badge) badge.textContent = '● TRABAJANDO';
+    if (badge) badge.style.background = 'rgba(46,204,113,0.9)';
+
+    // GIF del ejercicio actual
+    if (ex?.gif) {
+      setGifSrc('exercise-gif', ex.name);
+      gifWrap.classList.add('visible');
+    }
+    // Tips debajo
+    if (ex?.tips) {
+      document.getElementById('tips-content').innerHTML =
+        ex.tips.map(t => `<div class="tips-session-item">${t}</div>`).join('');
+      tipsWrap.classList.add('visible');
+    }
   } else {
-    // Descanso — mostrar GIF y tips del próximo ejercicio
+    // DESCANSO — mostrar próximo ejercicio
     const nextEx = sessionData.exercises[sessionData.currentExercise] || ex;
     document.getElementById('phase-label').textContent = 'DESCANSANDO';
     document.getElementById('timer-unit').textContent = 'DESCANSO';
@@ -1427,9 +1927,11 @@ function updateSessionUI(phase, ex) {
     document.getElementById('exercise-muscles').textContent = nextEx?.muscles || '';
     setTimerColor('red');
     if (gymMode) sessionEl.classList.add('phase-rest');
+    if (badge) badge.textContent = '● PRÓXIMO';
+    if (badge) badge.style.background = 'rgba(231,76,60,0.9)';
 
-    if (showGifs && nextEx?.gif) {
-      document.getElementById('exercise-gif').src = nextEx.gif;
+    if (nextEx?.gif) {
+      setGifSrc('exercise-gif', nextEx.name);
       gifWrap.classList.add('visible');
     }
     if (nextEx?.tips) {
@@ -1492,7 +1994,8 @@ function togglePause() {
 }
 
 function skipPhase() {
-  if (sessionData.phase === 'rest' && showRestPopup) {
+  if (sessionData.phase === 'rest' && showRestPopup && !skipPopupShownThisSession) {
+    skipPopupShownThisSession = true;
     document.getElementById('skip-popup').classList.add('visible');
   } else {
     clearInterval(timerInterval);
