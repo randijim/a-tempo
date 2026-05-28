@@ -987,6 +987,88 @@ html, body {
   box-shadow: 0 4px 14px var(--red-glow);
 }
 
+/* ── ONBOARDING PICKERS ─────────────────────────────────────────── */
+.ob-picker-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.ob-picker {
+  width: 100%;
+  height: 160px;
+  position: relative;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+.ob-picker::before,
+.ob-picker::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: 55px;
+  z-index: 2;
+  pointer-events: none;
+}
+.ob-picker::before {
+  top: 0;
+  background: linear-gradient(to bottom, var(--surface) 0%, transparent 100%);
+}
+.ob-picker::after {
+  bottom: 0;
+  background: linear-gradient(to top, var(--surface) 0%, transparent 100%);
+}
+.ob-picker-selector {
+  position: absolute;
+  left: 12px; right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 44px;
+  border-top: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
+  border-radius: 8px;
+  z-index: 1;
+  pointer-events: none;
+  background: rgba(231,76,60,0.06);
+}
+.ob-picker-list {
+  position: absolute;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.ob-picker-item {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-muted);
+  width: 100%;
+  flex-shrink: 0;
+  transition: color 0.2s, font-size 0.2s;
+  padding: 0 8px;
+  text-align: center;
+}
+.ob-picker-item.active {
+  color: var(--text);
+  font-size: 16px;
+}
+.ob-picker-val {
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
 /* ── UTILIDADES ──────────────────────────────────────────────────── */
 .hidden { display: none !important; }
 </style>
@@ -1025,35 +1107,46 @@ html, body {
   <div class="ob-row">
     <div class="ob-section">
       <div class="ob-label">Altura (cm)</div>
-      <input class="ob-input" type="number" id="ob-altura" placeholder="170" min="130" max="220"/>
+      <div class="ob-picker-wrap">
+        <div class="ob-picker" id="picker-altura">
+          <div class="ob-picker-selector"></div>
+          <div class="ob-picker-list" id="list-altura"></div>
+        </div>
+        <div class="ob-picker-val" id="val-altura">170 cm</div>
+      </div>
     </div>
     <div class="ob-section">
       <div class="ob-label">Edad</div>
-      <input class="ob-input" type="number" id="ob-edad" placeholder="25" min="12" max="99"/>
+      <div class="ob-picker-wrap">
+        <div class="ob-picker" id="picker-edad">
+          <div class="ob-picker-selector"></div>
+          <div class="ob-picker-list" id="list-edad"></div>
+        </div>
+        <div class="ob-picker-val" id="val-edad">25 años</div>
+      </div>
     </div>
   </div>
 
   <div class="ob-section" style="margin-top:16px;">
     <div class="ob-label">Nivel de entrenamiento</div>
-    <select class="ob-input" id="ob-nivel">
-      <option value="">Elegí tu nivel</option>
-      <option value="Principiante">Principiante — Sin experiencia previa</option>
-      <option value="Intermedio">Intermedio — 3 a 12 meses</option>
-      <option value="Avanzado">Avanzado — 1 a 3 años</option>
-      <option value="Experto">Experto — Más de 3 años</option>
-      <option value="Recuperacion">Recuperación — Movilidad y descanso activo</option>
-    </select>
+    <div class="ob-picker-wrap">
+      <div class="ob-picker" id="picker-nivel">
+        <div class="ob-picker-selector"></div>
+        <div class="ob-picker-list" id="list-nivel"></div>
+      </div>
+      <div class="ob-picker-val" id="val-nivel">Principiante</div>
+    </div>
   </div>
 
   <div class="ob-section">
     <div class="ob-label">Zona preferida</div>
-    <select class="ob-input" id="ob-zona">
-      <option value="">Elegí tu zona favorita</option>
-      <option value="Tren Superior">💪 Tren Superior</option>
-      <option value="Tren Inferior">🦵 Tren Inferior</option>
-      <option value="Cardio">❤️ Cardio</option>
-      <option value="Recuperacion">🌀 Recuperación</option>
-    </select>
+    <div class="ob-picker-wrap">
+      <div class="ob-picker" id="picker-zona">
+        <div class="ob-picker-selector"></div>
+        <div class="ob-picker-list" id="list-zona"></div>
+      </div>
+      <div class="ob-picker-val" id="val-zona">Tren Superior</div>
+    </div>
   </div>
 
   <button class="ob-btn" id="ob-submit" onclick="completeOnboarding()" disabled>Empezar →</button>
@@ -1568,6 +1661,7 @@ function showScreen(id) {
 
 // ─── SPLASH → ONBOARDING / HOME ───────────────────────────────────
 window.addEventListener('load', () => {
+  initObPickers();
   setTimeout(() => {
     if (profile) {
       showScreen('home');
@@ -1577,7 +1671,149 @@ window.addEventListener('load', () => {
   }, 2200);
 });
 
-// ─── ONBOARDING ───────────────────────────────────────────────────
+// ─── ONBOARDING PICKERS ──────────────────────────────────────────
+const OB_PICKERS = {};
+
+function makeObPicker(pickerId, listId, items, initialIdx, valId, suffix) {
+  const picker = document.getElementById(pickerId);
+  const list   = document.getElementById(listId);
+  const valEl  = document.getElementById(valId);
+  if (!picker || !list) return;
+
+  const ITEM_H = 44;
+  const COUNT  = items.length;
+
+  // Populate items
+  list.innerHTML = '';
+  items.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'ob-picker-item';
+    div.textContent = item.label || item;
+    list.appendChild(div);
+  });
+
+  let currentIdx = initialIdx;
+  let currentOffset = getOffset(currentIdx);
+  let startY = 0, startOffset = 0, isDragging = false;
+
+  function getOffset(idx) {
+    return 80 - ITEM_H / 2 - idx * ITEM_H;
+  }
+
+  function setOffset(offset, animate = false) {
+    list.style.transition = animate ? 'transform 0.2s ease' : 'none';
+    list.style.transform = `translateY(${offset}px)`;
+  }
+
+  function updateActive(idx) {
+    list.querySelectorAll('.ob-picker-item').forEach((el, i) => {
+      el.classList.toggle('active', i === idx);
+    });
+    const val = items[idx];
+    if (valEl) valEl.textContent = (val.label || val) + (suffix ? ' ' + suffix : '');
+    OB_PICKERS[pickerId] = val.value !== undefined ? val.value : val;
+    checkObForm();
+  }
+
+  function snap(offset) {
+    let idx = Math.round((80 - ITEM_H / 2 - offset) / ITEM_H);
+    idx = Math.max(0, Math.min(COUNT - 1, idx));
+    currentIdx = idx;
+    currentOffset = getOffset(idx);
+    setOffset(currentOffset, true);
+    updateActive(idx);
+    setTimeout(() => { list.style.transition = 'none'; }, 220);
+  }
+
+  // Touch
+  picker.addEventListener('touchstart', e => {
+    isDragging = true;
+    startY = e.touches[0].clientY;
+    startOffset = currentOffset;
+    list.style.transition = 'none';
+  }, { passive: true });
+
+  picker.addEventListener('touchmove', e => {
+    if (!isDragging) return;
+    const dy = e.touches[0].clientY - startY;
+    const minOff = getOffset(COUNT - 1) - 20;
+    const maxOff = getOffset(0) + 20;
+    currentOffset = Math.max(minOff, Math.min(maxOff, startOffset + dy));
+    setOffset(currentOffset);
+    let idx = Math.round((80 - ITEM_H / 2 - currentOffset) / ITEM_H);
+    idx = Math.max(0, Math.min(COUNT - 1, idx));
+    updateActive(idx);
+  }, { passive: true });
+
+  picker.addEventListener('touchend', () => {
+    isDragging = false;
+    snap(currentOffset);
+  });
+
+  // Mouse
+  picker.addEventListener('mousedown', e => {
+    isDragging = true;
+    startY = e.clientY;
+    startOffset = currentOffset;
+    list.style.transition = 'none';
+    picker.style.cursor = 'grabbing';
+  });
+  window.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    const dy = e.clientY - startY;
+    const minOff = getOffset(COUNT - 1) - 20;
+    const maxOff = getOffset(0) + 20;
+    currentOffset = Math.max(minOff, Math.min(maxOff, startOffset + dy));
+    setOffset(currentOffset);
+    let idx = Math.round((80 - ITEM_H / 2 - currentOffset) / ITEM_H);
+    idx = Math.max(0, Math.min(COUNT - 1, idx));
+    updateActive(idx);
+  });
+  window.addEventListener('mouseup', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    picker.style.cursor = 'grab';
+    snap(currentOffset);
+  });
+
+  setOffset(currentOffset);
+  updateActive(currentIdx);
+}
+
+function initObPickers() {
+  // Altura: 130 a 220 cm, default 170
+  const alturas = Array.from({length: 91}, (_, i) => ({ label: `${130 + i}`, value: 130 + i }));
+  makeObPicker('picker-altura', 'list-altura', alturas, 40, 'val-altura', 'cm');
+
+  // Edad: 12 a 80, default 25
+  const edades = Array.from({length: 69}, (_, i) => ({ label: `${12 + i}`, value: 12 + i }));
+  makeObPicker('picker-edad', 'list-edad', edades, 13, 'val-edad', 'años');
+
+  // Nivel
+  const niveles = [
+    { label: 'Principiante', value: 'Principiante' },
+    { label: 'Intermedio', value: 'Intermedio' },
+    { label: 'Avanzado', value: 'Avanzado' },
+    { label: 'Experto', value: 'Experto' },
+    { label: 'Recuperación', value: 'Recuperacion' },
+  ];
+  makeObPicker('picker-nivel', 'list-nivel', niveles, 0, 'val-nivel', '');
+
+  // Zona
+  const zonas = [
+    { label: '💪 Tren Superior', value: 'Tren Superior' },
+    { label: '🦵 Tren Inferior', value: 'Tren Inferior' },
+    { label: '❤️ Cardio', value: 'Cardio' },
+    { label: '🌀 Recuperación', value: 'Recuperacion' },
+  ];
+  makeObPicker('picker-zona', 'list-zona', zonas, 0, 'val-zona', '');
+
+  // Valores por defecto
+  OB_PICKERS['picker-altura'] = 170;
+  OB_PICKERS['picker-edad'] = 25;
+  OB_PICKERS['picker-nivel'] = 'Principiante';
+  OB_PICKERS['picker-zona'] = 'Tren Superior';
+}
 let selectedGender = null;
 
 function selectGender(g, btn) {
@@ -1588,9 +1824,8 @@ function selectGender(g, btn) {
 }
 
 function checkObForm() {
-  const nivel = document.getElementById('ob-nivel').value;
   const btn = document.getElementById('ob-submit');
-  btn.disabled = !(selectedGender && nivel);
+  btn.disabled = !selectedGender;
 }
 
 ['ob-nivel','ob-zona','ob-altura','ob-edad'].forEach(id => {
@@ -1602,10 +1837,10 @@ function completeOnboarding() {
   profile = {
     name: document.getElementById('ob-name').value.trim() || null,
     gender: selectedGender,
-    altura: parseInt(document.getElementById('ob-altura').value) || 170,
-    edad: parseInt(document.getElementById('ob-edad').value) || 25,
-    nivel: document.getElementById('ob-nivel').value,
-    zona: document.getElementById('ob-zona').value || 'Tren Superior',
+    altura: OB_PICKERS['picker-altura'] || 170,
+    edad: OB_PICKERS['picker-edad'] || 25,
+    nivel: OB_PICKERS['picker-nivel'] || 'Principiante',
+    zona: OB_PICKERS['picker-zona'] || 'Tren Superior',
     lastSession: null
   };
   localStorage.setItem('atProfile', JSON.stringify(profile));
