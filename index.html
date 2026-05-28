@@ -1817,7 +1817,7 @@ function selectGender(g, btn) {
 
 function checkObForm() {
   const btn = document.getElementById('ob-submit');
-  btn.disabled = !selectedGender;
+  if (btn) btn.disabled = !selectedGender;
 }
 
 ['ob-nivel','ob-zona','ob-altura','ob-edad'].forEach(id => {
@@ -1999,11 +1999,35 @@ function initQtyPicker(initialVal = 6) {
 
 // ─── INICIAR SESIÓN ───────────────────────────────────────────────
 function startSession() {
-  // Asegurar zona y qty
+  // Leer zona del picker de pre-sesión
+  if (OB_PICKERS['picker-zona-ps']) sessionData.zona = OB_PICKERS['picker-zona-ps'];
   if (!sessionData.zona) sessionData.zona = profile?.zona || 'Tren Superior';
   if (!sessionData.qty) sessionData.qty = 6;
 
   const nivel = profile?.nivel || 'Principiante';
+  const zona = sessionData.zona;
+  let pool = (EXERCISES[zona] && EXERCISES[zona][nivel])
+    ? EXERCISES[zona][nivel]
+    : (EXERCISES[zona] && EXERCISES[zona]["Todos los niveles"])
+    ? EXERCISES[zona]["Todos los niveles"]
+    : [];
+  if (!pool.length) pool = Object.values(EXERCISES[zona])[0] || [];
+
+  const shuffled = [...pool].sort(() => Math.random() - 0.5);
+  sessionData.exercises = shuffled.slice(0, Math.min(sessionData.qty, shuffled.length));
+  sessionData.nivel = nivel;
+  sessionData.currentExercise = 0;
+  sessionData.currentSerie = 1;
+  sessionData.totalSeries = nivel === 'Principiante' ? 3 : nivel === 'Intermedio' ? 3 : nivel === 'Avanzado' ? 4 : 5;
+  sessionData.completedSeries = 0;
+  sessionData.sessionStartTime = Date.now();
+  sessionData.paused = false;
+  sessionData.phase = 'work';
+  skipPopupShownThisSession = false;
+
+  requestWakeLock();
+  showPreview();
+}
   const zona = sessionData.zona;
   let pool = (EXERCISES[zona] && EXERCISES[zona][nivel])
     ? EXERCISES[zona][nivel]
