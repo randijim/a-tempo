@@ -1172,27 +1172,12 @@ html, body {
   <div class="ps-sub">Elegí zona y cantidad de ejercicios.</div>
 
   <div class="ps-label">Zona de entrenamiento</div>
-  <div class="zones-grid">
-    <div class="zone-card" data-zona="Tren Superior" onclick="selectZone(this)">
-      <div class="zone-icon">💪</div>
-      <div class="zone-name">Tren Superior</div>
-      <div class="zone-desc">Pecho, espalda, brazos</div>
+  <div class="ob-picker-wrap" style="margin-bottom:24px;">
+    <div class="ob-picker" id="picker-zona-ps">
+      <div class="ob-picker-selector"></div>
+      <div class="ob-picker-list" id="list-zona-ps"></div>
     </div>
-    <div class="zone-card" data-zona="Tren Inferior" onclick="selectZone(this)">
-      <div class="zone-icon">🦵</div>
-      <div class="zone-name">Tren Inferior</div>
-      <div class="zone-desc">Piernas, glúteos</div>
-    </div>
-    <div class="zone-card" data-zona="Cardio" onclick="selectZone(this)">
-      <div class="zone-icon">❤️</div>
-      <div class="zone-name">Cardio</div>
-      <div class="zone-desc">Resistencia y quema</div>
-    </div>
-    <div class="zone-card" data-zona="Recuperacion" onclick="selectZone(this)">
-      <div class="zone-icon">🌀</div>
-      <div class="zone-name">Recuperación</div>
-      <div class="zone-desc">Movilidad y descanso</div>
-    </div>
+    <div class="ob-picker-val" id="val-zona-ps">Tren Superior</div>
   </div>
 
   <div class="ps-label">Cantidad de ejercicios</div>
@@ -1715,7 +1700,10 @@ function makeObPicker(pickerId, listId, items, initialIdx, valId, suffix) {
     });
     const val = items[idx];
     if (valEl) valEl.textContent = (val.label || val) + (suffix ? ' ' + suffix : '');
-    OB_PICKERS[pickerId] = val.value !== undefined ? val.value : val;
+    const value = val.value !== undefined ? val.value : val;
+    OB_PICKERS[pickerId] = value;
+    // Si es el picker de zona de pre-sesión, sincronizar con sessionData
+    if (pickerId === 'picker-zona-ps') sessionData.zona = value;
     checkObForm();
   }
 
@@ -1866,18 +1854,20 @@ function updateHome() {
 // ─── PRE-SESIÓN ───────────────────────────────────────────────────
 function updatePresession() {
   if (!profile) return;
-  // Siempre asegurar que hay una zona seleccionada
-  if (!sessionData.zona) {
-    sessionData.zona = profile.zona || 'Tren Superior';
-  }
-  // Siempre asegurar que hay cantidad
-  if (!sessionData.qty) {
-    sessionData.qty = 6;
-  }
-  // Actualizar visual de zonas
-  document.querySelectorAll('.zone-card').forEach(c => {
-    c.classList.toggle('selected', c.dataset.zona === sessionData.zona);
-  });
+  if (!sessionData.zona) sessionData.zona = profile.zona || 'Tren Superior';
+  if (!sessionData.qty) sessionData.qty = 6;
+
+  // Inicializar drum roll de zona
+  const zonas = [
+    { label: '💪 Tren Superior', value: 'Tren Superior' },
+    { label: '🦵 Tren Inferior', value: 'Tren Inferior' },
+    { label: '❤️ Cardio', value: 'Cardio' },
+    { label: '🌀 Recuperación', value: 'Recuperacion' },
+  ];
+  const zonaIdx = zonas.findIndex(z => z.value === sessionData.zona);
+  makeObPicker('picker-zona-ps', 'list-zona-ps', zonas, zonaIdx >= 0 ? zonaIdx : 0, 'val-zona-ps', '');
+  // Sincronizar sessionData.zona con el picker
+  document.getElementById('picker-zona-ps')._onSelect = (val) => { sessionData.zona = val; };
 }
 
 function selectZone(card) {
