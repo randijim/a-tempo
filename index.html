@@ -2028,29 +2028,6 @@ function startSession() {
   requestWakeLock();
   showPreview();
 }
-  const zona = sessionData.zona;
-  let pool = (EXERCISES[zona] && EXERCISES[zona][nivel])
-    ? EXERCISES[zona][nivel]
-    : (EXERCISES[zona] && EXERCISES[zona]["Todos los niveles"])
-    ? EXERCISES[zona]["Todos los niveles"]
-    : [];
-  if (!pool.length) pool = Object.values(EXERCISES[zona])[0] || [];
-
-  const shuffled = [...pool].sort(() => Math.random() - 0.5);
-  sessionData.exercises = shuffled.slice(0, Math.min(sessionData.qty, shuffled.length));
-  sessionData.nivel = nivel;
-  sessionData.currentExercise = 0;
-  sessionData.currentSerie = 1;
-  sessionData.totalSeries = nivel === 'Principiante' ? 3 : nivel === 'Intermedio' ? 3 : nivel === 'Avanzado' ? 4 : 5;
-  sessionData.completedSeries = 0;
-  sessionData.sessionStartTime = Date.now();
-  sessionData.paused = false;
-  sessionData.phase = 'work';
-  skipPopupShownThisSession = false;
-
-  requestWakeLock();
-  showPreview();
-}
 
 // ─── PREVIEW DE EJERCICIO ─────────────────────────────────────────
 function showPreview() {
