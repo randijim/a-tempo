@@ -211,6 +211,14 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
   </div>
 
   <div class="ob-section" style="margin-top:16px;">
+    <div class="ob-label">Peso (kg)</div>
+    <div class="picker-wrap">
+      <div class="picker-box" id="pk-peso"><div class="picker-line"></div><div class="picker-list" id="pl-peso"></div></div>
+      <div class="picker-val" id="pv-peso">70 kg</div>
+    </div>
+  </div>
+
+  <div class="ob-section" style="margin-top:16px;">
     <div class="ob-label">Nivel de entrenamiento</div>
     <div class="picker-wrap">
       <div class="picker-box" id="pk-nivel"><div class="picker-line"></div><div class="picker-list" id="pl-nivel"></div></div>
@@ -617,7 +625,7 @@ let skipShown = false;
 let selectedGender = null;
 
 // Valores de los pickers del onboarding
-const PK = { altura:170, edad:25, nivel:'Principiante', zona:'Tren Superior', qty:6 };
+const PK = { altura:170, edad:25, peso:70, nivel:'Principiante', zona:'Tren Superior', qty:6 };
 
 // ── NAVEGACIÓN ───────────────────────────────────────────────────
 function showScreen(id) {
@@ -703,6 +711,9 @@ function initPickers() {
   const edades = Array.from({length:69}, (_,i) => ({label:`${12+i}`, value:12+i}));
   makePicker('pk-edad','pl-edad','pv-edad', edades, 13, 'años', v => PK.edad=v);
 
+  const pesos = Array.from({length:121}, (_,i) => ({label:`${40+i}`, value:40+i}));
+  makePicker('pk-peso','pl-peso','pv-peso', pesos, 30, 'kg', v => PK.peso=v);
+
   const niveles = [
     {label:'Principiante',value:'Principiante'},
     {label:'Intermedio',value:'Intermedio'},
@@ -738,6 +749,7 @@ function completeOnboarding() {
     gender: selectedGender,
     altura: PK.altura,
     edad: PK.edad,
+    peso: PK.peso,
     nivel: PK.nivel,
     zona: PK.zona,
     qty: PK.qty,
@@ -916,7 +928,7 @@ function endSession() {
   const elapsed = Math.floor((Date.now()-SD.startTime)/1000);
   const m=Math.floor(elapsed/60), s=elapsed%60;
   const mets={Principiante:4,Intermedio:5.5,Avanzado:7,Experto:8,Recuperacion:3};
-  const peso = profile?.altura ? Math.round(profile.altura*0.45-10) : 70;
+  const peso = profile?.peso || (profile?.altura ? Math.round(profile.altura*0.45-10) : 70);
   const cals = Math.round((mets[SD.nivel]||5)*peso*elapsed/3600);
   document.getElementById('sum-cals').textContent = cals;
   document.getElementById('sum-time').textContent = `${m}:${s.toString().padStart(2,'0')}`;
