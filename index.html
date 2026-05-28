@@ -1656,7 +1656,11 @@ function showScreen(id) {
   document.getElementById(id).classList.add('active');
   if (id === 'home') updateHome();
   if (id === 'config') updateConfig();
-  if (id === 'presession') { updatePresession(); initQtyPicker(sessionData.qty || 6); }
+  if (id === 'presession') {
+    updatePresession();
+    const currentQty = sessionData.qty || 6;
+    initQtyPicker(currentQty);
+  }
 }
 
 // ─── SPLASH → ONBOARDING / HOME ───────────────────────────────────
@@ -1844,7 +1848,7 @@ function completeOnboarding() {
     lastSession: null
   };
   localStorage.setItem('atProfile', JSON.stringify(profile));
-  showScreen('presession');
+  showScreen('home');
 }
 
 // ─── HOME ─────────────────────────────────────────────────────────
@@ -2037,7 +2041,12 @@ function startSession() {
 // ─── PREVIEW DE EJERCICIO ─────────────────────────────────────────
 function showPreview() {
   const ex = sessionData.exercises[sessionData.currentExercise];
-  if (!ex) { startPhase('work'); return; }
+  if (!ex) { 
+    // Si no hay ejercicio, ir directo a la sesión
+    showScreen('session');
+    startPhase('work'); 
+    return; 
+  }
 
   const exNum = sessionData.currentExercise + 1;
   const total = sessionData.exercises.length;
