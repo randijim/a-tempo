@@ -1862,21 +1862,18 @@ function updateHome() {
 // ─── PRE-SESIÓN ───────────────────────────────────────────────────
 function updatePresession() {
   if (!profile) return;
-  // Solo pre-seleccionar si no hay zona elegida aún
+  // Siempre asegurar que hay una zona seleccionada
   if (!sessionData.zona) {
-    document.querySelectorAll('.zone-card').forEach(c => {
-      c.classList.remove('selected');
-      if (c.dataset.zona === profile.zona) {
-        c.classList.add('selected');
-        sessionData.zona = profile.zona;
-      }
-    });
-  } else {
-    // Mantener la selección actual visual
-    document.querySelectorAll('.zone-card').forEach(c => {
-      c.classList.toggle('selected', c.dataset.zona === sessionData.zona);
-    });
+    sessionData.zona = profile.zona || 'Tren Superior';
   }
+  // Siempre asegurar que hay cantidad
+  if (!sessionData.qty) {
+    sessionData.qty = 6;
+  }
+  // Actualizar visual de zonas
+  document.querySelectorAll('.zone-card').forEach(c => {
+    c.classList.toggle('selected', c.dataset.zona === sessionData.zona);
+  });
 }
 
 function selectZone(card) {
@@ -2008,8 +2005,11 @@ function initQtyPicker(initialVal = 6) {
 
 // ─── INICIAR SESIÓN ───────────────────────────────────────────────
 function startSession() {
-  if (!sessionData.zona) { alert('Elegí una zona primero'); return; }
-  const nivel = profile.nivel;
+  // Asegurar zona y qty
+  if (!sessionData.zona) sessionData.zona = profile?.zona || 'Tren Superior';
+  if (!sessionData.qty) sessionData.qty = 6;
+
+  const nivel = profile?.nivel || 'Principiante';
   const zona = sessionData.zona;
   let pool = (EXERCISES[zona] && EXERCISES[zona][nivel])
     ? EXERCISES[zona][nivel]
